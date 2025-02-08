@@ -1,0 +1,12 @@
+{
+  "extends": "@tsconfig/node20/tsconfig.json",
+  "compilerOptions": {
+     "outDir": "dist", // js distribution folder
+     "noEmitOnError": true, // whether it should NOT compile to js if type errors are found
+    "allowJs": true, // whether js files should be allowed in the project
+    "checkJs": true,
+    "sourceMap": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
