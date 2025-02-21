@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 import "dotenv/config";
 import authRoutes from "./routes/auth.routes.js";
 import session from "express-session";
-import db from "./utils/database.js";
+import db from "./utils/database.js"
+import User from "./models/user";
 
 const app = express()
 app.use(bodyParser.json())
@@ -36,14 +37,18 @@ app.get('/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})
 })
 
-// Test the database connection
+// database connection
 db.authenticate()
-  .then(() => {
+.then(() => {
     console.log("Connection to the database has been established successfully.");
-      app.listen(3000, () => {
-          console.log('Server running on port 3000')
-      })
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
+    return User.create({ name: "Daniel", loginId: "daniel@gmail.com", password: "random-password" });
+
+}).then((result) => {
+    // console.log("inserted result - ", result);
+    app.listen(3000, () => {
+        console.log('Server running on port 3000')
+    })
+})
+.catch((err: any) => {
+    console.error(err.message);
+});

@@ -5,8 +5,13 @@
      "noEmitOnError": true, // whether it should NOT compile to js if type errors are found
     "allowJs": true, // whether js files should be allowed in the project
     "checkJs": true,
-    "sourceMap": false
+    "sourceMap": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*",
+    ".sequelizerc"
+  ],
+  "exclude": ["node_modules"],
 }

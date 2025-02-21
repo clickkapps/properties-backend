@@ -1,14 +1,22 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from '@sequelize/core';
+import { PostgresDialect } from '@sequelize/postgres';
+import User from "../models/user";
 
 // This sets up a connection pool
 const dbHost = process.env.DB_HOST || '';
-const dbName = process.env.DB_DATABASE || '';
+const dbName = process.env.DB_NAME || '';
 const dbUsername = process.env.DB_USERNAME || '';
 const dbPassword = process.env.DB_PASSWORD || '';
 
-const sequelize = new Sequelize( dbName, dbUsername, dbPassword, {
+const sequelize = new Sequelize({
+    dialect: PostgresDialect,
+    database: dbName,
+    user: dbUsername,
+    password: dbPassword,
     host: dbHost,
-    dialect: 'postgres',
+//     ssl: true,
+//   clientMinMessages: 'notice',
+    models: [User]
 })
 
 export default sequelize;
