@@ -21,8 +21,18 @@ module.exports = {
         unique: true,
         comment: "Identifier for users to login. It can be email or phone number"
       },
-      name: {
+      firstName: {
         type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      lastName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      photo: {
+        type: Sequelize.TEXT,
         allowNull: true,
         defaultValue: null
       },

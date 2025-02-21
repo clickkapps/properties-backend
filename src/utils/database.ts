@@ -1,6 +1,6 @@
 import { Sequelize } from '@sequelize/core';
 import { PostgresDialect } from '@sequelize/postgres';
-import User from "../models/user";
+import UserModel from "../models/user.model";
 
 // This sets up a connection pool
 const dbHost = process.env.DB_HOST || '';
@@ -16,7 +16,7 @@ const sequelize = new Sequelize({
     host: dbHost,
 //     ssl: true,
 //   clientMinMessages: 'notice',
-    models: [User]
+    models: [UserModel]
 })
 
 export default sequelize;

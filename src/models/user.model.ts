@@ -5,10 +5,16 @@ import {Table, Attribute, ColumnName} from '@sequelize/core/decorators-legacy';
 class User extends Model {
 
     @Attribute(DataTypes.STRING)
-    declare name: string;
+    firstName?: string;
 
     @Attribute(DataTypes.STRING)
-    declare loginId: string;
+    lastName?: string;
+
+    @Attribute(DataTypes.STRING)
+    loginId?: string;
+
+    @Attribute(DataTypes.STRING)
+    photo?: string;
 
     @Attribute(DataTypes.STRING)
     declare password: string;

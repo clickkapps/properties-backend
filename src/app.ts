@@ -4,7 +4,6 @@ import "dotenv/config";
 import authRoutes from "./routes/auth.routes.js";
 import session from "express-session";
 import db from "./utils/database.js"
-import User from "./models/user";
 
 const app = express()
 app.use(bodyParser.json())
@@ -41,8 +40,7 @@ app.get('/', (req, res, next) => {
 db.authenticate()
 .then(() => {
     console.log("Connection to the database has been established successfully.");
-    return User.create({ name: "Daniel", loginId: "daniel@gmail.com", password: "random-password" });
-
+    // return User.create({ })
 }).then((result) => {
     // console.log("inserted result - ", result);
     app.listen(3000, () => {
