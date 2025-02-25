@@ -16,7 +16,7 @@ module.exports = {
         primaryKey: true,
       },
       loginId: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
         unique: true,
         comment: "Identifier for users to login. It can be email or phone number"
@@ -41,7 +41,37 @@ module.exports = {
         allowNull: true,
         defaultValue: null
       },
+      publicKey: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      secreteKey: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      contactEmail: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      contactPhone: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
       lastLoginAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: null
+      },
+      currentLoginAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: null
+      },
+      basicInfoUpdatedAt: {
         type: Sequelize.DATE,
         allowNull: true,
         defaultValue: null

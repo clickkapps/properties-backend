@@ -7,11 +7,12 @@
     "checkJs": true,
     "sourceMap": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
   },
   "include": [
     "src/**/*",
     ".sequelizerc"
   ],
-  "exclude": ["node_modules"],
+  "files": ["src/helpers/type-extensions.d.ts"],
+  "exclude": ["node_modules"]
 }

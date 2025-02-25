@@ -1,9 +1,9 @@
 import express from 'express'
 import bodyParser from "body-parser";
 import "dotenv/config";
-import authRoutes from "./routes/auth.routes.js";
+import authRoutes from "./routes/auth.routes";
 import session from "express-session";
-import db from "./utils/database.js"
+import db from "./helpers/database"
 
 const app = express()
 app.use(bodyParser.json())
