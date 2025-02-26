@@ -1,4 +1,4 @@
-import { User } from "../models/user"; // Adjust path to your User model
+import { User } from "../models/User"; // Adjust path to your User model
 import "express-session";
 
 // Declares global types or extends existing ones
@@ -6,9 +6,8 @@ declare global  {
     // Extend the in-built global Express library
     namespace Express {
 
-        interface User {
-            token: string;
-            user: User
+        // We make express user assume the structure of the User model
+        interface User extends User {
         }
 
         interface SessionData {
@@ -31,11 +30,12 @@ declare global  {
 
 }
 
+type passportUser = string & User
+
 declare module 'express-session' {
     export interface SessionData {
         passport?: {
-            token: string;
-            user: any;
+            user: passportUser;
         };
     }
 }

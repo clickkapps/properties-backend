@@ -4,6 +4,10 @@ import "dotenv/config";
 import authRoutes from "./routes/auth.routes";
 import session from "express-session";
 import db from "./helpers/database"
+import {isAuthenticated} from "./middlewares/auth.middleware";
+import userRoutes from "./routes/user.routes";
+import agentRoutes from "./routes/agent.routes";
+import packageRoutes from "./routes/package.routes";
 
 const app = express()
 app.use(bodyParser.json())
@@ -31,6 +35,9 @@ app.use((_, res, next) => {
 
 // Authentication routes
 app.use('/auth', authRoutes)
+app.use('/user', isAuthenticated, userRoutes)
+app.use('/agent', isAuthenticated, agentRoutes)
+app.use('/package', packageRoutes)
 
 app.get('/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})

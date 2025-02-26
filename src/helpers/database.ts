@@ -1,6 +1,8 @@
 import { Sequelize } from '@sequelize/core';
 import { PostgresDialect } from '@sequelize/postgres';
-import User from "../models/user";
+import User from "../models/User";
+import Package from "../models/Package";
+import {Agent} from "../models/Agent";
 
 
 const dbHost = process.env.DB_HOST || '';
@@ -16,7 +18,7 @@ const sequelize = new Sequelize({
     host: dbHost,
 //     ssl: true,
 //   clientMinMessages: 'notice',
-    models: [User]
+    models: [User, Package, Agent]
 })
 
 export default sequelize;

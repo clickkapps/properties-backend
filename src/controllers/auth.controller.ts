@@ -11,11 +11,15 @@ export const getAuthenticationCompleted = (req: Request, res: Response) => {
     const passportInfo = req.session
     // passportInfo.
     console.log("passportInfo", passportInfo.passport)
-    if(!passportInfo){
-        res.status(401).send({error: "Authentication failed"});
+
+    const webAppUrl = process.env.WEB_APP_URL || '';
+    if(!(passportInfo?.passport)){
+        res.redirect(`${webAppUrl}?auth=failed`);
         return;
     }
 
-    res.json({ token: req.session.passport })
+    const token = passportInfo.passport?.user.token
+    res.redirect(`${webAppUrl}/login?auth=success&token=${token}`);
 }
+
 

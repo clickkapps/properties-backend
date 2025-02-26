@@ -1,5 +1,13 @@
-import {CreationOptional, DataTypes, Model} from "@sequelize/core";
-import {Table, Attribute, PrimaryKey, AutoIncrement} from '@sequelize/core/decorators-legacy';
+import {
+    CreationOptional,
+    DataTypes,
+    HasOneCreateAssociationMixin,
+    HasOneGetAssociationMixin,
+    Model,
+    NonAttribute
+} from "@sequelize/core";
+import {Table, Attribute, PrimaryKey, AutoIncrement, HasOne} from '@sequelize/core/decorators-legacy';
+import {Agent} from "./Agent";
 
 @Table
 class User extends Model {
@@ -54,6 +62,12 @@ class User extends Model {
         delete values.secreteKey;
         return values;
     }
+
+    @HasOne(() => Agent, 'userId')
+    agent?: NonAttribute<Agent>;
+
+    declare getAgent: HasOneGetAssociationMixin<Agent>;
+    declare createAgent: HasOneCreateAssociationMixin<Agent>;
 
 }
 
