@@ -4,12 +4,7 @@ import User from "../models/User";
 
 
 const getAgentByUserId = async (userId: number ) => {
-    const user = await User.findByPk(userId)
-    let agent = await user?.getAgent();
-    if(!agent) {
-       agent = await user?.createAgent({})
-    }
-    return agent;
+    return await User.findByPk(userId);
 }
 
 export const postCreateAgent = async (req: Request, res: Response) => {

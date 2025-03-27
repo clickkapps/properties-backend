@@ -8,6 +8,7 @@ import {isAuthenticated} from "./middlewares/auth.middleware";
 import userRoutes from "./routes/user.routes";
 import agentRoutes from "./routes/agent.routes";
 import packageRoutes from "./routes/package.routes";
+import {logIncomingRequests} from "./middlewares/monitor.middleware";
 
 const app = express()
 app.use(bodyParser.json())
@@ -25,21 +26,28 @@ if (process.env['APP_ENV'] === 'production') {
 
 app.use(session(sessionConfig))
 
+const allowedOrigins = ['http://localhost:5173',];
+
 // Handling Cors Headers
-app.use((_, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", 'localhost:3000, localhost:5000');
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+    }
     res.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
     next()
 })
 
-// Authentication routes
-app.use('/auth', authRoutes)
-app.use('/user', isAuthenticated, userRoutes)
-app.use('/agent', isAuthenticated, agentRoutes)
-app.use('/package', packageRoutes)
+// app.use(logIncomingRequests)
 
-app.get('/', (req, res, next) => {
+// Authentication routes
+app.use('/api/auth', authRoutes)
+app.use('/api/user', isAuthenticated, userRoutes)
+app.use('/api/agent', isAuthenticated, agentRoutes)
+app.use('/api/package', packageRoutes)
+
+app.get('api/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})
 })
 

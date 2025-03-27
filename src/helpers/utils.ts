@@ -30,3 +30,15 @@ export const hashPassword = async (password: string, saltRounds = 10): Promise<s
 export const comparePassword = async (password: string, hash: string): Promise<boolean> => {
     return await bcrypt.compare(password, hash);
 };
+
+export function generateRandomCode(length: number = 6): string {
+    const digits = '0123456789';
+    let otp = '';
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * digits.length);
+        otp += digits[randomIndex];
+    }
+
+    return otp;
+}

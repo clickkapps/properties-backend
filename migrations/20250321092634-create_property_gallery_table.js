@@ -3,28 +3,34 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-
-    return queryInterface.createTable('Agents', {
+    /**
+     * Add altering commands here.
+     *
+     * Example:
+     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     */
+    return queryInterface.createTable('PropertyGalleries', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      userId: {
+      propertyId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Users',
+          model: 'Properties',
           key: 'id'
         },
         onDelete: 'CASCADE',
         allowNull: false,
       },
-      packageId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Packages',
-          key: 'id'
-        },
+      path: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      caption: {
+        type: Sequelize.STRING,
         allowNull: true,
         defaultValue: null
       },
@@ -37,12 +43,6 @@ module.exports = {
         allowNull: false,
       }
     })
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
   },
 
   async down (queryInterface, Sequelize) {
@@ -52,6 +52,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    return queryInterface.dropTable('Agents');
+    return queryInterface.dropTable('PropertyGalleries');
   }
 };

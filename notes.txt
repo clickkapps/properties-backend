@@ -1,0 +1,1 @@
+Create Migration: npx sequelize-cli migration:generate --name migration-skeleton

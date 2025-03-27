@@ -2,7 +2,14 @@ import { Sequelize } from '@sequelize/core';
 import { PostgresDialect } from '@sequelize/postgres';
 import User from "../models/User";
 import Package from "../models/Package";
-import {Agent} from "../models/Agent";
+import PromotedProperty from "../models/PromotedProperty";
+import Property from "../models/Property";
+import PropertyCategory from "../models/PropertyCategory";
+import PropertyGallery from "../models/PropertyGallery";
+import PropertySpecification from "../models/PropertySpecification";
+import SubscribedPackage from "../models/SubscribedPackage";
+import Subscription from "../models/Subscription";
+import OTP from "../models/OTP";
 
 
 const dbHost = process.env.DB_HOST || '';
@@ -18,7 +25,12 @@ const sequelize = new Sequelize({
     host: dbHost,
 //     ssl: true,
 //   clientMinMessages: 'notice',
-    models: [User, Package, Agent]
+    models: [
+        User, Package, PromotedProperty,
+        Property, PropertyCategory, PropertyGallery,
+        PropertySpecification, SubscribedPackage,
+        Subscription, OTP
+    ]
 })
 
 export default sequelize;
