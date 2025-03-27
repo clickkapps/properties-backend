@@ -22,9 +22,9 @@ class OTP extends Model {
     @Default(0)
     declare attempts: CreationOptional<number>
 
-    @Attribute(DataTypes.ENUM(['pending', 'verified', 'canceled']))
+    @Attribute(DataTypes.ENUM(['pending', 'verified', 'cancelled']))
     @Default('pending')
-    declare status: CreationOptional<'pending' | 'verified' | 'canceled'>
+    declare status: CreationOptional<'pending' | 'verified' | 'cancelled'>
 }
 
 export default OTP;

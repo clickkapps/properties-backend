@@ -1,5 +1,4 @@
 import { Sequelize } from '@sequelize/core';
-import { PostgresDialect } from '@sequelize/postgres';
 import User from "../models/User";
 import Package from "../models/Package";
 import PromotedProperty from "../models/PromotedProperty";
@@ -10,6 +9,7 @@ import PropertySpecification from "../models/PropertySpecification";
 import SubscribedPackage from "../models/SubscribedPackage";
 import Subscription from "../models/Subscription";
 import OTP from "../models/OTP";
+import {PostgresDialect} from "@sequelize/postgres";
 
 
 const dbHost = process.env.DB_HOST || '';
@@ -23,6 +23,7 @@ const sequelize = new Sequelize({
     user: dbUsername,
     password: dbPassword,
     host: dbHost,
+
 //     ssl: true,
 //   clientMinMessages: 'notice',
     models: [

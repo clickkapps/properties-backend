@@ -1,6 +1,6 @@
 import passport from "passport";
-import { Request, Response } from "express";
-import {comparePassword, generateKey, generateRandomCode} from "../helpers/utils";
+import {NextFunction, Request, Response} from "express";
+import {comparePassword, generateKey, generateRandomCode, hashPassword} from "../helpers/utils";
 import {ApiResponse} from "../types/shared.types";
 import OTP from "../models/OTP";
 import {Op} from "sequelize";
@@ -29,107 +29,135 @@ export const getAuthenticationCompleted = (req: Request, res: Response) => {
 }
 
 
-export const requestPhoneAuthentication = async (req: Request, res: Response) => {
+export const requestPhoneAuthentication = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { phone } = req.body;
-    console.log("request: ", phone )
+   try {
 
-    let apiResponse: ApiResponse
+       const { phone } = req.body;
+       console.log("request: ", phone )
 
-    if (!phone) {
-        res.status(403).send({ message: 'Invalid request '})
-        return;
-    }
+       let apiResponse: ApiResponse
 
-    // return if previous otp sent is less than 3 minutes
-    const existingOTP = await OTP.findOne({
-        where: {
-            phone: phone,
-            status: 'pending',
-            createdAt: {
-                [Op.gte]: moment().subtract(3, 'minutes')
-            }
-        }
-    })
+       if (!phone) {
+           res.status(403).send({ message: 'Invalid request '})
+           return;
+       }
 
-    if(existingOTP) {
-        apiResponse = { message: "Verification code already sent to email", data:{
-                serverId: existingOTP.serverId,
-                otp: existingOTP.phone,
-                isNew: false
-            }
-        }
-        res.status(200).send(apiResponse)
-        return;
-    }
+       // return if previous otp sent is less than 3 minutes
+       const existingOTP = await OTP.findOne({
+           where: {
+               phone: phone,
+               status: 'pending',
+               createdAt: {
+                   [Op.gte]: moment().subtract(3, 'minutes')
+               }
+           }
+       })
 
-    // generate and send verification code to phone number
-    const otp = generateRandomCode(6)
-    const serverId = generateKey()
+       if(existingOTP) {
+           apiResponse = { message: "Verification code already sent to email", data:{
+                   serverId: existingOTP.serverId,
+                   otp: existingOTP.phone,
+                   isNew: false
+               }
+           }
+           res.status(200).send(apiResponse)
+           return;
+       }
 
-    // send otp to phone number provided
-    const otpCreated = await OTP.create({
-        phone: phone,
-        serverId: serverId,
-    })
-    console.log("otp", otp)
 
-    apiResponse = { message: "Verification code sent to email", data:{
-            serverId: otpCreated.serverId,
-            otp: otpCreated.phone,
-            isNew: true
-        }
-    }
-    res.status(200).send(apiResponse)
+       // generate and send verification code to phone number
+       const otp = generateRandomCode(6)
+       const serverId = generateKey()
+
+       await OTP.update({
+           status: 'cancelled',
+       },{
+           where: {
+               phone: phone,
+               status: 'pending',
+               createdAt: {
+                   [Op.gte]: moment().subtract(3, 'minutes')
+               }
+           }
+       })
+
+       // send otp to phone number provided
+       const otpCreated = await OTP.create({
+           phone: phone,
+           serverId: serverId,
+           code: await hashPassword(otp)
+       })
+       console.log("otp", otp)
+
+       apiResponse = { message: "Verification code sent to email", data:{
+               serverId: otpCreated.serverId,
+               otp: otpCreated.phone,
+               isNew: true
+           }
+       }
+       res.status(200).send(apiResponse)
+
+   }catch(err) {
+       next(err)
+   }
 
 }
 
-export const verifyPhoneAuthentication = async (req: Request, res: Response) => {
-    const { code, phone, serverId } = req.body;
-    let apiResponse: ApiResponse
+export const verifyPhoneAuthentication = async (req: Request, res: Response, next: NextFunction) => {
 
-    // return if previous otp sent is less than 3 minutes
-    let otp = await OTP.findOne({
-        where: {
-            phone: phone,
-            serverId: serverId,
-            status: 'pending'
+    try {
+
+        const { code, phone, serverId } = req.body;
+        let apiResponse: ApiResponse
+
+        // return if previous otp sent is less than 3 minutes
+        let otp = await OTP.findOne({
+            where: {
+                phone: phone,
+                serverId: serverId,
+                status: 'pending'
+            }
+        })
+
+        if (!otp) {
+            apiResponse = { message: "Invalid request" }
+            res.status(403).send(apiResponse)
+            return
         }
-    })
 
-    if (!otp) {
-        apiResponse = { message: "Invalid request" }
-        res.status(403).send(apiResponse)
-        return
+        // check if the number of attempts are more than 3
+        if(otp.attempts >= 3) {
+            await otp.update({ status: 'cancelled' })
+            apiResponse = { message: `You have exceeded the maximum number of attempts` }
+            res.status(403).send(apiResponse)
+            return;
+        }
+
+        const isValid = await comparePassword(code, otp.code ?? '')
+
+        if(!isValid) {
+
+            otp = await otp.update({ attempts: otp.attempts + 1 })
+            const attemptsRemaining = 4 - otp.attempts
+            apiResponse = { message: `Invalid verification code. ${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining` }
+            res.status(403).send(apiResponse)
+            return
+
+        }
+
+        await otp.update({ status: 'verified' })
+
+        const tokenPayload = await generateAccessTokenFromLoginId({
+            loginId: phone,
+        })
+
+        apiResponse = { message: "Verified", data: tokenPayload.token }
+        res.status(200).send(apiResponse)
+
+    }catch (error) {
+        next(error)
     }
-
-    // check if the number of attempts are more than 3
-    if(otp.attempts >= 3) {
-        apiResponse = { message: "You have exceeded the maximum number of attempts"}
-        res.status(403).send(apiResponse)
-        return;
-    }
-
-    const isValid = await comparePassword(code, otp.code ?? '')
-
-    if(!isValid) {
-
-        otp = await otp.update({ attempts: otp.attempts + 1 })
-        apiResponse = { message: `Invalid verification code. ${3 - otp.attempts} attempts remaining` }
-        res.status(403).send(apiResponse)
-        return
-
-    }
-
-    await otp.update({ status: 'verified' })
-
-    const tokenPayload = await generateAccessTokenFromLoginId({
-        loginId: phone,
-    })
-
-    apiResponse = { message: "Verified", data: tokenPayload }
-    res.status(200).send(apiResponse)
-
 
 }
 

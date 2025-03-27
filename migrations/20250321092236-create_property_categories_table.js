@@ -43,6 +43,7 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    // await queryInterface.removeConstraint('Properties', 'Properties_categoryId_fkey');
     return queryInterface.dropTable('PropertyCategories')
   }
 };
