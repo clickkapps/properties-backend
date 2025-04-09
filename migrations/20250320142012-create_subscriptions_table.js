@@ -35,7 +35,7 @@ module.exports = {
         defaultValue: 'pending', // pending | active | invalid
       },
       subscriptionType: {
-        type: Sequelize.STRING, // one-time monthly, weekly,
+        type: Sequelize.STRING, // one-time, daily, weekly, monthly every17days,
         allowNull: false,
         defaultValue: 'one-time',
       },

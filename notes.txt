@@ -1,1 +1,29 @@
 Create Migration: npx sequelize-cli migration:generate --name migration-skeleton
+
+Flow of application.
+1. A agent signs up / sign in
+2. Updates their profile if they haven't done that already
+3. To list property user has to subscribe
+ - (this involves property approval, photography services if required)
+4. if agent wants ad-on services user has to subscribe to standard
+    - property showings, legal
+5. For services like advertisement, conveyance,
+
+Packages:
+
+For Sellers (Agent / Property Owners):
+    Basic:
+    - list property on website + advertise on our social media platform
+
+    Standard (Basic + Ad-Ons):
+    - Property showings
+    - Photography service
+    - Legal
+
+One time payments:
+
+For All (Buyer / Seller / Non of them)
+    - Advertisement: one time fee
+    - Conveyance: 0ne time fee
+    - Virtual tour - one time fee
+    - promotion of property on Featured section of the website

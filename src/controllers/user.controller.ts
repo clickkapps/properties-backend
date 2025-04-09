@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import User from "../models/User";
 import {ApiResponse} from "../types/shared.types";
 import moment from "moment";
@@ -17,24 +17,33 @@ export const getBasicInfo = async (req: Request, res: Response) => {
     res.status(200).json( apiResponse )
 }
 
-export const updateBasicInfo = async (req: Request, res: Response) => {
-    const userId = (req.user as User).id
-    const updated = await User.update({
-        firstName: req.body.firstName,
-        lastName: req.body.firstName,
-        photo: req.body.photo,
-        contactEmail: req.body.contactEmail,
-        contactPhone: req.body.contactPhone,
-        basicInfoUpdatedAt: moment()
-    }, {
-        where: {
-            id: userId
+export const updateBasicInfo = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const userId = (req.user as User).id
+        const updated = await User.update({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            photo: req.body.photo,
+            contactEmail: req.body.contactEmail,
+            contactPhone: req.body.contactPhone,
+            basicInfoUpdatedAt: moment()
+        }, {
+            where: {
+                id: userId
+            }
+        })
+        console.log("updated", updated)
+        const apiResponse: ApiResponse = {
+            message: "Profile updated",
+            data: updated
         }
-    })
-    console.log("updated", updated)
-    const apiResponse: ApiResponse = {
-        message: "Profile updated",
-        data: updated
+        res.status(200).json(apiResponse)
+
+    }catch(err){
+
+        next(err)
+
     }
-    res.status(200).json(apiResponse)
 }

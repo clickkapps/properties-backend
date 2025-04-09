@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import multer from "multer";
 
 
 /**
@@ -41,4 +42,17 @@ export function generateRandomCode(length: number = 6): string {
     }
 
     return otp;
+}
+
+export const requestFile = multer({
+    storage: multer.memoryStorage(), // Store file in memory for now
+});
+
+export function slugify(text: string): string {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[\s\W-]+/g, '-')  // Replace spaces and non-word characters with -
+        .replace(/^-+|-+$/g, '');   // Remove starting and ending hyphens
 }

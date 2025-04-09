@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response, Errback} from 'express'
+import express from 'express'
 import bodyParser from "body-parser";
 import "dotenv/config";
 import authRoutes from "./routes/auth.routes";
@@ -8,9 +8,9 @@ import {isAuthenticated} from "./middlewares/auth.middleware";
 import userRoutes from "./routes/user.routes";
 import agentRoutes from "./routes/agent.routes";
 import packageRoutes from "./routes/package.routes";
-import {logIncomingRequests} from "./middlewares/monitor.middleware";
 import {get404, get500} from "./controllers/errors.controller";
-import {ApiResponse} from "./types/shared.types";
+import propertyRoutes from "./routes/property.routes";
+
 
 const app = express()
 app.use(bodyParser.json())
@@ -44,10 +44,11 @@ app.use((req, res, next) => {
 // app.use(logIncomingRequests)
 
 // Authentication routes
+
 app.use('/api/auth', authRoutes)
 app.use('/api/user', isAuthenticated, userRoutes)
-app.use('/api/agent', isAuthenticated, agentRoutes)
 app.use('/api/package', packageRoutes)
+app.use('/api/property', propertyRoutes )
 
 app.get('api/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})

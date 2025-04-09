@@ -25,7 +25,7 @@ export const getAuthenticationCompleted = (req: Request, res: Response) => {
     }
 
     const token = passportInfo.passport?.user.token
-    res.redirect(`${webAppUrl}/login?auth=success&token=${token}`);
+    res.redirect(`${webAppUrl}/login?oauth=success&token=${token}`);
 }
 
 

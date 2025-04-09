@@ -15,6 +15,9 @@ class PropertyCategory extends Model {
     declare title?: string; // category title
 
     @Attribute(DataTypes.STRING)
+    declare slug?: string;
+
+    @Attribute(DataTypes.STRING)
     declare description?: string; // description of the category if any
 
 
