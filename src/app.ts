@@ -46,9 +46,9 @@ app.use((req, res, next) => {
 // Authentication routes
 
 app.use('/api/auth', authRoutes)
-app.use('/api/user', isAuthenticated, userRoutes)
-app.use('/api/package', packageRoutes)
-app.use('/api/property', propertyRoutes )
+app.use('/api/users', isAuthenticated, userRoutes)
+app.use('/api/packages', packageRoutes)
+app.use('/api/properties', propertyRoutes )
 
 app.get('api/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})

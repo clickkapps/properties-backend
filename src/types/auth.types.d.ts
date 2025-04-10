@@ -1,6 +1,10 @@
 import User from "../models/Ueser";
 
-export type CreateUserParams = {
+// type AdminUser = User & { role: 'admin' };
+// type Status = 'active' | 'inactive' | 'pending';
+// type ApiResponse = User | Error;
+
+export interface CreateUserParams {
     loginId: string;
     firstName?: string;
     lastName?: string;

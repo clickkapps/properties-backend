@@ -3,6 +3,9 @@ import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 import {Readable} from "stream";
+import {PutFileParams} from "../types/storage.types";
+import {extname} from "path";
+import { lookup } from 'mime-types';
 
 class StorageService {
 
@@ -22,9 +25,13 @@ class StorageService {
         });
     }
 
-    async putFile(body: Buffer, folder: string = 'public', fileName?: string, mimeType?: string): Promise<{ generatedFilePath: string, fileName?: string, mimeType?: string }> {
+    async putFile({ body, fileName, folder = 'public' }: PutFileParams ): Promise<{ generatedFilePath: string, mimeType: string | false }> {
+
+        const ext = extname(fileName);
+        const mimeType = lookup(fileName);
+
         const adjustedPath = uuidv4();
-        const generatedFilePath = `${folder}/${adjustedPath}`;
+        const generatedFilePath = `${folder}/${adjustedPath}${ext}`;
 
         await this.s3.send(new PutObjectCommand({
             Bucket: this.bucket,
@@ -32,7 +39,7 @@ class StorageService {
             Body: body,
         }));
 
-        return { generatedFilePath: generatedFilePath, fileName: fileName, mimeType: mimeType };
+        return { generatedFilePath: generatedFilePath, mimeType: mimeType };
     }
 
     async getTemporaryUrl(path: string, expiresIn = 3600) {

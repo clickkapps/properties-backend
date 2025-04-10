@@ -1,7 +1,17 @@
 import {CreationOptional, DataTypes, Model, NonAttribute} from "@sequelize/core";
-import {Attribute, AutoIncrement, BelongsTo, Default, PrimaryKey, Table} from "@sequelize/core/decorators-legacy";
+import {
+    Attribute,
+    AutoIncrement,
+    BelongsTo,
+    ColumnName,
+    Default, HasMany,
+    PrimaryKey,
+    Table
+} from "@sequelize/core/decorators-legacy";
 import User from "./User";
 import PropertyCategory from "./PropertyCategory";
+import PropertySpecification from "./PropertySpecification";
+import PropertyGallery from "./PropertyGallery";
 
 @Table({ tableName: "Properties" })
 export class Property  extends  Model {
@@ -25,9 +35,10 @@ export class Property  extends  Model {
     declare creator?: NonAttribute<User>;
 
     @Attribute(DataTypes.INTEGER)
+    @ColumnName('categoryId')
     declare propertyCategoryId?: number
 
-    @BelongsTo(() => PropertyCategory, 'propertyCategoryId')
+    @BelongsTo(() => PropertyCategory, 'categoryId')
     declare propertyCategory?: NonAttribute<PropertyCategory>;
 
     @Attribute(DataTypes.STRING)
@@ -58,6 +69,11 @@ export class Property  extends  Model {
     @Attribute(DataTypes.DATE)
     declare publishedAt?: Date
 
+    @HasMany(() => PropertySpecification, 'propertyId')
+    declare specifications?: NonAttribute<PropertySpecification[]>;
+
+    @HasMany(() => PropertyGallery, 'propertyId')
+    declare gallery?: NonAttribute<PropertyGallery[]>;
 
 }
 

@@ -34,4 +34,9 @@ const sequelize = new Sequelize({
     ]
 })
 
+// ✅ default scope is called automatically on User.find() etc
+User.addScope('defaultScope', {
+    attributes: { exclude: [ ...User.sensitiveProperties ] },
+});
+
 export default sequelize;

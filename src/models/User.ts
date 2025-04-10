@@ -1,9 +1,9 @@
 import {
     CreationOptional,
     DataTypes,
-    Model,
+    Model, Sequelize,
 } from "@sequelize/core";
-import {Table, Attribute, PrimaryKey, AutoIncrement, HasOne} from '@sequelize/core/decorators-legacy';
+import {Table, Attribute, PrimaryKey, AutoIncrement} from '@sequelize/core/decorators-legacy';
 
 @Table
 class User extends Model {
@@ -28,13 +28,13 @@ class User extends Model {
     photo?: string;
 
     @Attribute(DataTypes.STRING)
-    password?: string;
+    declare password?: string;
 
     @Attribute(DataTypes.STRING)
     publicKey?: string
 
     @Attribute(DataTypes.STRING)
-    secreteKey?: string
+    declare secreteKey?: string
 
     @Attribute(DataTypes.STRING)
     contactEmail?: CreationOptional<string>
@@ -51,14 +51,23 @@ class User extends Model {
     @Attribute(DataTypes.DATE)
     basicInfoUpdatedAt?: Date;
 
-    // Hide sensitive fields when serializing
-    toJSON() {
-        const values = { ...this.get() };
-        delete values.password; // Remove password from output
-        delete values.secreteKey;
-        return values;
-    }
+    static sensitiveProperties: string[] = [ 'password', 'secreteKey' ]
+    static optionalForAssociations: string[] = [ ...User.sensitiveProperties, 'lastLoginAt', 'currentLoginAt', 'publicKey', 'loginId', 'currentLoginAt','createdAt', 'updatedAt', 'basicInfoUpdatedAt' ]
+
+    // // Hide sensitive fields when serializing
+    // toJSON() {
+    //     const values = { ...this.get() };
+    //
+    //     for (const field of Array.isArray((this.constructor as typeof User).sensitiveProperties) ? (this.constructor as typeof User).sensitiveProperties : []) {
+    //         delete values[field];
+    //     }
+    //
+    //     return values;
+    // }
+
+
 
 }
+
 
 export default User;

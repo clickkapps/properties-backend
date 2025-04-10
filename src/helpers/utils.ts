@@ -44,7 +44,7 @@ export function generateRandomCode(length: number = 6): string {
     return otp;
 }
 
-export const requestFile = multer({
+export const reqFile = multer({
     storage: multer.memoryStorage(), // Store file in memory for now
 });
 
