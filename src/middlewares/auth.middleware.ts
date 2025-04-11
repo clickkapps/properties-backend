@@ -16,7 +16,9 @@ export const useGoogleStrategy = new GoogleStrategy({
         // console.log("accessToken => ", accessToken);
         // console.log("refreshToken => ", refreshToken);
         // profile.email, profile['given_name'], profile['family_name'], profile['picture']
-        generateAccessTokenFromLoginId( { loginId: profile['email'], firstName: profile['given_name'], lastName: profile['family_name'] })
+        generateAccessTokenFromLoginId( { loginId: profile['email'],
+            loginIdType: 'email',
+            firstName: profile['given_name'], lastName: profile['family_name'] })
             .then((tokenPayload) => { done(null, tokenPayload);})
 
     }
@@ -24,7 +26,6 @@ export const useGoogleStrategy = new GoogleStrategy({
 
 
 export const isAuthenticated =  (req: Request, res: Response, next: NextFunction) => {
-
 
     const authHeader = req.headers.authorization;
 

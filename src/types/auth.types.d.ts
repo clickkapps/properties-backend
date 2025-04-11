@@ -6,6 +6,7 @@ import User from "../models/Ueser";
 
 export interface CreateUserParams {
     loginId: string;
+    loginIdType?: 'phone' | 'email';
     firstName?: string;
     lastName?: string;
     photo?: string;

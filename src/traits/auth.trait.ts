@@ -20,7 +20,9 @@ export const generateAccessTokenFromLoginId = async (args: CreateUserParams) => 
             lastName: args.lastName,
             photo: args.photo,
             publicKey: publicKey,
-            secreteKey: secreteKey
+            secreteKey: secreteKey,
+            contactEmail: args.loginIdType == 'email' ? args.loginId : undefined,
+            contactPhone: args.loginIdType == 'phone' ? args.loginId : undefined,
         }
     })
 

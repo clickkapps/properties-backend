@@ -150,6 +150,7 @@ export const verifyPhoneAuthentication = async (req: Request, res: Response, nex
 
         const tokenPayload = await generateAccessTokenFromLoginId({
             loginId: phone,
+            loginIdType: 'phone'
         })
 
         apiResponse = { message: "Verified", data: tokenPayload.token }
