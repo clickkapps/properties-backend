@@ -57,7 +57,7 @@ export const requestPhoneAuthentication = async (req: Request, res: Response, ne
        if(existingOTP) {
            apiResponse = { message: "Verification code already sent to email", data:{
                    serverId: existingOTP.serverId,
-                   otp: existingOTP.phone,
+                   phone: existingOTP.phone,
                    isNew: false
                }
            }
@@ -92,7 +92,7 @@ export const requestPhoneAuthentication = async (req: Request, res: Response, ne
 
        apiResponse = { message: "Verification code sent to email", data:{
                serverId: otpCreated.serverId,
-               otp: otpCreated.phone,
+               phone: otpCreated.phone,
                isNew: true
            }
        }

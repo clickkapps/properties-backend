@@ -10,7 +10,8 @@ import agentRoutes from "./routes/agent.routes";
 import packageRoutes from "./routes/package.routes";
 import {get404, get500} from "./controllers/errors.controller";
 import propertyRoutes from "./routes/property.routes";
-
+import {logIncomingRequests} from "./middlewares/monitor.middleware";
+import cors, {CorsOptions} from "cors";
 
 const app = express()
 app.use(bodyParser.json())
@@ -28,22 +29,22 @@ if (process.env['APP_ENV'] === 'production') {
 
 app.use(session(sessionConfig))
 
-const allowedOrigins = ['http://localhost:5173',];
 
-// Handling Cors Headers
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
+let whitelist = ['http://localhost:5173']
+
+const corsOptions: CorsOptions = {
+    origin: (origin, callback) => {
+        if (origin && whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
     }
-    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
-    next()
-})
+};
 
-// app.use(logIncomingRequests)
+app.use(cors(corsOptions))
 
-// Authentication routes
+app.use(logIncomingRequests)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/users', isAuthenticated, userRoutes)

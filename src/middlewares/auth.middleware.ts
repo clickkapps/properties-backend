@@ -25,6 +25,7 @@ export const useGoogleStrategy = new GoogleStrategy({
 
 export const isAuthenticated =  (req: Request, res: Response, next: NextFunction) => {
 
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -37,6 +38,7 @@ export const isAuthenticated =  (req: Request, res: Response, next: NextFunction
     const appKey = process.env.APP_KEY || '';
     try {
 
+        console.log("isAuthenticated method called")
         const decoded = jwt.verify(token, appKey);
         const user = decoded as User;
         console.log("decoded => ", user)
