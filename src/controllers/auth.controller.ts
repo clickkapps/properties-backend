@@ -5,7 +5,7 @@ import {ApiResponse} from "../types/shared.types";
 import OTP from "../models/OTP";
 import {Op} from "sequelize";
 import moment from "moment";
-import {generateAccessTokenFromLoginId} from "../traits/auth.trait";
+import { generateAccessTokenFromLoginId } from "../traits/auth.trait";
 
 export const getGoogleAuthentication =  passport.authenticate('google', { scope: [ 'email', 'profile' ] })
 export const getGoogleCallback = passport.authenticate( 'google', {

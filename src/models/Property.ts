@@ -53,6 +53,10 @@ export class Property  extends  Model {
     @Attribute(DataTypes.ENUM(['rent', 'rent']))
     declare offerType?: 'rent' | 'sale'
 
+    @Attribute(DataTypes.STRING)
+    @Default('USD')
+    declare currency?: CreationOptional<string>;
+
     @Attribute(DataTypes.DOUBLE)
     declare amount?: CreationOptional<number>;
 
@@ -74,6 +78,16 @@ export class Property  extends  Model {
 
     @HasMany(() => PropertyGallery, 'propertyId')
     declare gallery?: NonAttribute<PropertyGallery[]>;
+
+    @Attribute(DataTypes.STRING)
+    declare address?: string;
+
+    @Attribute(DataTypes.STRING)
+    @Default('Ghana')
+    declare country?: CreationOptional<string>;
+
+    @Attribute(DataTypes.STRING)
+    declare region?: string;
 
 }
 

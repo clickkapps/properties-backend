@@ -16,18 +16,6 @@ import {isAuthenticated} from "../middlewares/auth.middleware";
 
 const router = Router()
 
-router.get("/", getProperties)
-router.get("/:id", getPropertyDetail)
-router.delete("/:id", isAuthenticated, removeProperty)
-router.post("/:ownerId", isAuthenticated, reqFile.fields([
-        { name: 'mainImage', maxCount: 1 },
-        { name: 'otherImages', maxCount: 10 }
-]), createProperty);
-router.put("/:id", isAuthenticated, reqFile.fields([
-        { name: 'mainImage', maxCount: 1 },
-        { name: 'otherImages', maxCount: 10 }
-]), updateProperty);
-
 
 // Group for categories
 const categoriesRouter = Router();
@@ -51,6 +39,17 @@ router.use('/categories', categoriesRouter);
 router.use('/specifications', specificationsRouter);
 router.use('/gallery', galleryRouter);
 
+router.get("/", getProperties)
+router.get("/:id", getPropertyDetail)
+router.delete("/:id", isAuthenticated, removeProperty)
+router.post("/:ownerId", isAuthenticated, reqFile.fields([
+        { name: 'mainImage', maxCount: 1 },
+        { name: 'otherImages', maxCount: 10 }
+]), createProperty);
+router.put("/:id", isAuthenticated, reqFile.fields([
+        { name: 'mainImage', maxCount: 1 },
+        { name: 'otherImages', maxCount: 10 }
+]), updateProperty);
 
 
 export default router

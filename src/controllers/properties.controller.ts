@@ -45,10 +45,13 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
 
         const { propertyCategoryId,
             title, description, specifications,
-            offerType, price
+            offerType,
+            price,
+            currency,
+            address, country, region
         } = req.body
 
-        if(!title || !description || !specifications || !propertyCategoryId) {
+        if(!title || !description || !specifications || !propertyCategoryId || !country || !region || !currency || !price) {
             apiResponse = { message: "Invalid request" };
             res.status(400).send(apiResponse)
             return;
@@ -68,7 +71,11 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             description,
             mainImagePath,
             offerType,
-            amount: price
+            amount: price,
+            currency,
+            address,
+            country,
+            region,
         })
 
         // create the image gallery
