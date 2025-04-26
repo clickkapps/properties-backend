@@ -89,6 +89,15 @@ export class Property  extends  Model {
     @Attribute(DataTypes.STRING)
     declare region?: string;
 
+    @Attribute(DataTypes.INTEGER)
+    declare rooms?: number
+
+    @Attribute(DataTypes.INTEGER)
+    declare washrooms?: number
+
+    @Attribute(DataTypes.INTEGER)
+    declare kitchens?: number
+
 }
 
 export default Property;

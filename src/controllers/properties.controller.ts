@@ -29,6 +29,9 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             return
         }
 
+
+        console.log("createProperty called.", req.body)
+
         const creatorId = (req.user as User).id
 
         let apiResponse: ApiResponse
@@ -44,14 +47,20 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
         const otherImages = files?.otherImages || [];
 
         const { propertyCategoryId,
-            title, description, specifications,
+            title,
+            description,
+            specifications,
             offerType,
-            price,
+            amount,
             currency,
-            address, country, region
+            address,
+            country,
+            region,
+            rooms,
+            washrooms
         } = req.body
 
-        if(!title || !description || !propertyCategoryId || !country || !region || !currency || !price) {
+        if(!title || !description || !propertyCategoryId || !country || !region || !currency || !amount) {
             apiResponse = { message: "Invalid request" };
             res.status(400).send(apiResponse)
             return;
@@ -74,11 +83,13 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             description,
             mainImagePath,
             offerType,
-            amount: price,
+            amount: amount,
             currency,
             address,
             country,
             region,
+            rooms,
+            washrooms
         })
 
         // create the image gallery
@@ -194,6 +205,7 @@ export const getProperties = async(req: Request, res: Response, next: NextFuncti
         // you can apply filters here //
 
         const properties = await Property.findAll( {
+            order: [['createdAt', 'DESC']],
             // include: [
             //     {
             //         association: 'user',
@@ -204,24 +216,24 @@ export const getProperties = async(req: Request, res: Response, next: NextFuncti
             // ],
         });
 
-        // const transformed = properties.map((property) => {
-        //     if(property.mainImagePath) {
-        //         const split = property.mainImagePath.split("/")
-        //         // const folder = split[0]
-        //         property.mainImagePath = split[1]
-        //     }
-        //     if(property.gallery && property.gallery.length > 0) {
-        //         property.gallery.map((g) => {
-        //             if(g?.path) {
-        //                 g.path = g.path.split("/")[1]
-        //             }
-        //             return g
-        //         })
-        //     }
-        //     return property
-        // })
+        const transformed = properties.map((property) => {
+            if(property.mainImagePath) {
+                const split = property.mainImagePath.split("/")
+                // const folder = split[0]
+                property.mainImagePath = split[1]
+            }
+            // if(property.gallery && property.gallery.length > 0) {
+            //     property.gallery.map((g) => {
+            //         if(g?.path) {
+            //             g.path = g.path.split("/")[1]
+            //         }
+            //         return g
+            //     })
+            // }
+            return property
+        })
 
-        const apiResponse: ApiResponse = { message: "success", data: properties };
+        const apiResponse: ApiResponse = { message: "success", data: transformed };
         res.status(200).json(apiResponse)
 
     }catch (error) {

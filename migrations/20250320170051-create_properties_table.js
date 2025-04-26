@@ -25,7 +25,7 @@ module.exports = {
         allowNull: false,
       },
       creatorId: {
-        type: Sequelize.INTEGER,  // House | room | apartment | land
+        type: Sequelize.INTEGER,
         references: {
           model: 'Users',
           key: 'id'
