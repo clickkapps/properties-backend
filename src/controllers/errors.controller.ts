@@ -8,9 +8,7 @@ export const get404 = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const get500 = (error: any, req: Request, res: Response, next: NextFunction) => {
-    console.log("error message: ", error.message)
-    console.log("error code: ", error.status)
-
+    console.log("error stack: ", error.stack)
     const apiResponse: ApiResponse = { message: error.message, data : req.url}
     res.status(error.status || 500).json(apiResponse)
 }

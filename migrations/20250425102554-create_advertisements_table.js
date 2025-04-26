@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    return queryInterface.createTable('Subscriptions', {
+    return queryInterface.createTable('Advertisements', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -24,38 +24,47 @@ module.exports = {
         onDelete: 'CASCADE',
         allowNull: false,
       },
-      serviceType: {
-        type: Sequelize.STRING, // properties_promotion | basic | conveyance | etc
-        allowNull: true,
-        defaultValue: null
-      },
       status: {
-        type: Sequelize.STRING(10),
-        allowNull: false,
-        defaultValue: 'pending', // pending | active | invalid
-      },
-      subscriptionType: {
-        type: Sequelize.STRING, // one-time, daily, weekly, monthly every17days,
-        allowNull: false,
-        defaultValue: 'one-time',
-      },
-      amountPayable: {
-        type: Sequelize.DOUBLE({ length: 8, decimals: 2}),
-        allowNull: true,
-        defaultValue: 0.00,
-      },
-      amountPaid: {
-        type: Sequelize.DOUBLE({ length: 8, decimals: 2}),
-        allowNull: true,
-        defaultValue: 0.00,
-      },
-      startDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
         allowNull: true,
         defaultValue: null
       },
-      endDate: {
+      subscriptionId: { // last active subscription
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Subscriptions',
+          key: 'id'
+        },
+        allowNull: true,
+        defaultValue: null
+      },
+      startFrom: {
         type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: null
+      },
+      endAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: null
+      },
+      contactPhone: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      contactEmail: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      imagePath: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
+      link: {
+        type: Sequelize.TEXT,
         allowNull: true,
         defaultValue: null
       },
@@ -66,8 +75,7 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-      },
-
+      }
     })
   },
 
@@ -78,6 +86,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    return queryInterface.dropTable('Subscriptions', {})
+    return queryInterface.dropTable('Advertisements');
   }
 };

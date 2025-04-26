@@ -40,12 +40,13 @@ router.use('/specifications', specificationsRouter);
 router.use('/gallery', galleryRouter);
 
 router.get("/", getProperties)
-router.get("/:id", getPropertyDetail)
-router.delete("/:id", isAuthenticated, removeProperty)
-router.post("/:ownerId", isAuthenticated, reqFile.fields([
+router.post("/", isAuthenticated, reqFile.fields([
         { name: 'mainImage', maxCount: 1 },
         { name: 'otherImages', maxCount: 10 }
 ]), createProperty);
+router.get("/:id", getPropertyDetail)
+router.delete("/:id", isAuthenticated, removeProperty)
+
 router.put("/:id", isAuthenticated, reqFile.fields([
         { name: 'mainImage', maxCount: 1 },
         { name: 'otherImages', maxCount: 10 }

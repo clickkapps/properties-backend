@@ -51,16 +51,19 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             address, country, region
         } = req.body
 
-        if(!title || !description || !specifications || !propertyCategoryId || !country || !region || !currency || !price) {
+        if(!title || !description || !propertyCategoryId || !country || !region || !currency || !price) {
             apiResponse = { message: "Invalid request" };
             res.status(400).send(apiResponse)
             return;
         }
 
+        let mainImagePath
         // upload main image and get path
-        const mainImageOriginalName = mainImage?.originalname
-        const uploadedFile = await storage.putFile({ body: mainImage?.buffer, fileName: mainImageOriginalName} )
-        const mainImagePath = `${uploadedFile.generatedFilePath}?mimeType=${uploadedFile.mimeType}`
+        if(mainImage) {
+            const mainImageOriginalName = mainImage?.originalname
+            const uploadedFile = await storage.putFile({ body: mainImage?.buffer, fileName: mainImageOriginalName} )
+            mainImagePath = `${uploadedFile.generatedFilePath}?mimeType=${uploadedFile.mimeType}`
+        }
 
         // create the property
         const created = await Property.create({
@@ -79,11 +82,15 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
         })
 
         // create the image gallery
-        await addPropertyGallery(created.id, otherImages)
-
+        if(otherImages) {
+            await addPropertyGallery(created.id, otherImages)
+        }
 
         // create the specification
-        await addPropertySpecifications(created.id, JSON.parse(specifications))
+
+        if(specifications) {
+            await addPropertySpecifications(created.id, JSON.parse(specifications))
+        }
 
         apiResponse = { message: "Property created successfully!", data: created };
         res.status(200).json(apiResponse)
@@ -187,8 +194,32 @@ export const getProperties = async(req: Request, res: Response, next: NextFuncti
         // you can apply filters here //
 
         const properties = await Property.findAll( {
-            include: attachedPropertyRelationships,
+            // include: [
+            //     {
+            //         association: 'user',
+            //         attributes: { exclude: [
+            //                 ...User.optionalForAssociations
+            //             ] },
+            //     }
+            // ],
         });
+
+        // const transformed = properties.map((property) => {
+        //     if(property.mainImagePath) {
+        //         const split = property.mainImagePath.split("/")
+        //         // const folder = split[0]
+        //         property.mainImagePath = split[1]
+        //     }
+        //     if(property.gallery && property.gallery.length > 0) {
+        //         property.gallery.map((g) => {
+        //             if(g?.path) {
+        //                 g.path = g.path.split("/")[1]
+        //             }
+        //             return g
+        //         })
+        //     }
+        //     return property
+        // })
 
         const apiResponse: ApiResponse = { message: "success", data: properties };
         res.status(200).json(apiResponse)
@@ -246,8 +277,22 @@ export const removePropertyGallery = async(req: Request, res: Response, next: Ne
 }
 
 export const getPropertyDetail = async(req: Request, res: Response, next: NextFunction) => {
-    const propertyId = req.params.propertyId;
-    const property = await getPropertyById(Number(propertyId))
+
+    const propertyId = req.params.id;
+    const property = await getPropertyById(+propertyId)
+    if(property?.mainImagePath) {
+        const split = property.mainImagePath.split("/")
+        // const folder = split[0]
+        property.mainImagePath = split[1]
+    }
+    if(property?.gallery && property.gallery.length > 0) {
+        property.gallery = property.gallery.map((g) => {
+            if(g?.path) {
+                g.path = g.path.split("/")[1]
+            }
+            return g
+        })
+    }
     const apiResponse: ApiResponse = { message: "success", data: property };
     res.status(200).json(apiResponse)
 }
