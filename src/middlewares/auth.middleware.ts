@@ -3,6 +3,7 @@ import googleOAuth2, {VerifyCallback} from "passport-google-oauth2";
 import {generateAccessTokenFromLoginId} from "../traits/auth.trait";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
+import {defineAbilitiesFor} from "../helpers/defineAbility";
 
 const GoogleStrategy = googleOAuth2.Strategy;
 
@@ -52,5 +53,19 @@ export const isAuthenticated =  (req: Request, res: Response, next: NextFunction
 
     }
 
+}
+
+export function isAuthorized(action: string, subject: string) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const user = (req.user as User); // Assume you attached req.user after login
+        const ability = defineAbilitiesFor(user);
+
+        if (ability.can(action as any, subject as any)) {
+             next();
+        } else {
+             res.status(403).json({ message: 'Forbidden' });
+        }
+        return
+    };
 }
 

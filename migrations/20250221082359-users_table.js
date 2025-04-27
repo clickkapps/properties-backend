@@ -76,6 +76,11 @@ module.exports = {
         allowNull: true,
         defaultValue: null
       },
+      requiresPasswordUpdate: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

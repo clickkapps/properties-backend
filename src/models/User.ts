@@ -22,6 +22,9 @@ class User extends Model {
     firstName?: string;
 
     @Attribute(DataTypes.STRING)
+    declare role: string;
+
+    @Attribute(DataTypes.STRING)
     lastName?: string;
 
     @Attribute(DataTypes.STRING)
@@ -50,6 +53,9 @@ class User extends Model {
 
     @Attribute(DataTypes.DATE)
     basicInfoUpdatedAt?: Date;
+
+    @Attribute(DataTypes.BOOLEAN)
+    requiresPasswordUpdate?: boolean;
 
     static sensitiveProperties: string[] = [ 'password', 'secreteKey' ]
     static optionalForAssociations: string[] = [ ...User.sensitiveProperties, 'lastLoginAt', 'currentLoginAt', 'publicKey', 'loginId', 'currentLoginAt','createdAt', 'updatedAt', 'basicInfoUpdatedAt' ]

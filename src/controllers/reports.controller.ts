@@ -1,35 +1,46 @@
 import {NextFunction, Request, Response} from "express";
 import {ApiResponse} from "../types/shared.types";
-import Property from "../models/Property";
-import User from "../models/User";
+import FeatureView from "../models/FeatureView";
+import {col, fn, sql, Op} from "@sequelize/core";
+import where = sql.where;
 
-export const getUserAnalytics = async(req: Request, res: Response, next: NextFunction) => {
 
-    const userId = (req.user as User).id
-    const data: {publishedPropertiesCount?: number}  = {}
+export const setFeatureView = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
 
-        // Published properties
-        data['publishedPropertiesCount'] = await Property.count({
+        const  { id, feature } = req.body
+
+
+        const [record, created] = await FeatureView.findOrCreate({
             where: {
-                userId: userId,
-                published: true
+                [Op.and]: [
+                    { feature: feature },
+                    { id: id },
+                    where(fn('DATE', col('createdAt')), Op.eq, fn('CURRENT_DATE'))
+                ]
+            },
+            defaults: {
+                dailyViews: 1,
+                feature: feature
             }
-        })
+        });
 
-        // Property views
-        // const propertyViewsCount = await
-
-        // Advertisements
-        const apiResponse: ApiResponse = {
-            data,
-            message: "success"
+        // if record already exist by increasing the number of views
+        if(!created) {
+            await record.update({
+                dailyViews: (record.dailyViews || 1) + 1
+            })
         }
 
-        res.status(200).send(apiResponse);
+        const apiResponse: ApiResponse = {
+            message: "success"
+        }
+        res.status(200).json(apiResponse)
 
-    }catch (e) {
-        next(e)
+
+    }catch (error) {
+        next(error);
     }
+
 }

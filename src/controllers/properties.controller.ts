@@ -13,6 +13,9 @@ import {
     attachedPropertyRelationships,
     getPropertyById
 } from "../traits/properties.trait";
+import moment from "moment";
+import {defineAbilitiesFor} from "../helpers/defineAbility";
+import {permissionActions, permissionSubjects} from "../helpers/constants";
 
 
 
@@ -137,15 +140,19 @@ export const updateProperty = async(req: Request, res: Response, next: NextFunct
            mainImagePath = `${uploadedFile.generatedFilePath}?mimeType=${uploadedFile.mimeType}`
         }
 
-        // you can only add to otherImages in the updateProperty function. Separate method to delete otherImage
-        const otherImages = files?.otherImages || [];
-
         // you can only add to specifications in the updateProperty function. Separate method to delete specification
 
         const { propertyCategoryId,
             title, description,
             specifications,
-            offerType, price
+            offerType,
+            amount,
+            currency,
+            address,
+            country,
+            region,
+            rooms,
+            washrooms
         } = req.body
 
 
@@ -155,14 +162,26 @@ export const updateProperty = async(req: Request, res: Response, next: NextFunct
             description: description || property?.description,
             mainImagePath: mainImagePath,
             offerType,
-            amount: price
+            amount,
+            currency,
+            address,
+            country,
+            region,
+            rooms,
+            washrooms
         })
 
-        // add to the gallery. it's safe to add up because deletion is done on a different route
-        await addPropertyGallery(property.id, otherImages)
+        // you can only add to otherImages in the updateProperty function. Separate method to delete otherImage
+        const otherImages = files?.otherImages || [];
+        if(otherImages.length > 0) {
+            // add to the gallery. it's safe to add up because deletion is done on a different route
+            await addPropertyGallery(property.id, otherImages)
+        }
 
         // add to the specification, it's safe to add up because deletion is handled on a different route
-        await addPropertySpecifications(property.id, JSON.parse(specifications))
+        if(specifications) {
+            await addPropertySpecifications(property.id, JSON.parse(specifications))
+        }
 
         apiResponse = { message: "success", data: await getPropertyById(property.id) };
 
@@ -190,6 +209,37 @@ export const removeProperty = async(req: Request, res: Response, next: NextFunct
         }
 
         await property.destroy()
+        apiResponse = { message: "Property published", data: await getPropertyById(property.id) }
+        res.status(200).json(apiResponse)
+
+
+    }catch (error) {
+        next(error);
+    }
+}
+export const publishProperty = async(req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const  { id } = req.params
+
+        // related fields and specifications are supposed to (cascade delete) when this property is deleted
+        let apiResponse: ApiResponse
+
+        const property = await Property.findByPk(id)
+        if (!property) {
+            apiResponse = { message: "Property not found." }
+            res.status(400).json(apiResponse)
+            return
+        }
+
+        const userId = (req.user as User).id
+
+        await property.update({
+            published: true,
+            publisherId: userId,
+            publishedAt: new Date()
+        })
         apiResponse = { message: "Property deleted", data: await getPropertyById(property.id) }
         res.status(200).json(apiResponse)
 
@@ -199,21 +249,104 @@ export const removeProperty = async(req: Request, res: Response, next: NextFunct
     }
 }
 
+export const unPublishProperty = async(req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const  { id } = req.params
+
+        // related fields and specifications are supposed to (cascade delete) when this property is deleted
+        let apiResponse: ApiResponse
+
+        const property = await Property.findByPk(id)
+        if (!property) {
+            apiResponse = { message: "Property not found." }
+            res.status(400).json(apiResponse)
+            return
+        }
+
+        await property.update({
+            published: false,
+            publisherId: null,
+            publishedAt: null
+        })
+        apiResponse = { message: "Property unpublished", data: await getPropertyById(property.id) }
+        res.status(200).json(apiResponse)
+
+
+    }catch (error) {
+        next(error);
+    }
+}
+
+
+const propertiesQueryWhere = (req: Request) => {
+
+    const { userId, published  } = req.body
+
+    const where: any = {}
+
+    if (published === 'false' || published === undefined) {
+
+        const user = req.user as User
+
+        if(!user) {
+            throw new Error('Forbidden')
+        }
+
+        const ability = defineAbilitiesFor(user);
+
+        if(ability.cannot(permissionActions.read, permissionSubjects.unpublishedProperties)) {
+            throw new Error('Forbidden')
+        }
+
+        // check if user is not admin, then return properties of that user
+    } else {
+
+        where.published = true;
+
+    }
+
+    if (userId !== undefined) {
+        where.userId = +userId;
+    }
+
+    return where
+}
+
+// count published or unpublished properties
+export const countProperties = async(req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const where = propertiesQueryWhere(req)
+
+        const count = await Property.count({
+            where: where
+        })
+
+        const apiResponse: ApiResponse = {
+            data: {count},
+            message: "success"
+        }
+
+        res.status(200).send(apiResponse);
+
+    }catch (e) {
+        next(e)
+    }
+}
+
 export const getProperties = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
-        // you can apply filters here //
+
+        const where = propertiesQueryWhere(req)
+
 
         const properties = await Property.findAll( {
+            where: where,
             order: [['createdAt', 'DESC']],
-            // include: [
-            //     {
-            //         association: 'user',
-            //         attributes: { exclude: [
-            //                 ...User.optionalForAssociations
-            //             ] },
-            //     }
-            // ],
         });
 
         const transformed = properties.map((property) => {

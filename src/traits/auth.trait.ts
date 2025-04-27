@@ -13,9 +13,10 @@ export const generateAccessTokenFromLoginId = async (args: CreateUserParams) => 
     // const hashedPassword = await hashPassword(args.password || secreteKey);
     const [user, created] = await User.findOrCreate({
         where: {
-            loginId: args.loginId
+            loginId: args.loginId,
         },
         defaults: {
+            role: args.role,
             firstName: args.firstName,
             lastName: args.lastName,
             photo: args.photo,

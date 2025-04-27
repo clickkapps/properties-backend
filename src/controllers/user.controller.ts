@@ -21,14 +21,16 @@ export const updateBasicInfo = async (req: Request, res: Response, next: NextFun
 
     try {
 
-        const userId = (req.user as User).id
+        const user = (req.user as User)
+        const userId = user.id
         const updated = await User.update({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             photo: req.body.photo,
             contactEmail: req.body.contactEmail,
             contactPhone: req.body.contactPhone,
-            basicInfoUpdatedAt: moment()
+            basicInfoUpdatedAt: moment(),
+            role: req.body.role || user.role || 'agent',
         }, {
             where: {
                 id: userId

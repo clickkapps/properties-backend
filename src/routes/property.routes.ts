@@ -12,7 +12,8 @@ import {
         updatePropertyCategory
 } from "../controllers/properties.controller";
 import {reqFile} from "../helpers/utils";
-import {isAuthenticated} from "../middlewares/auth.middleware";
+import {isAuthenticated, isAuthorized} from "../middlewares/auth.middleware";
+import Property from "../models/Property";
 
 const router = Router()
 
@@ -40,7 +41,7 @@ router.use('/specifications', specificationsRouter);
 router.use('/gallery', galleryRouter);
 
 router.get("/", getProperties)
-router.post("/", isAuthenticated, reqFile.fields([
+router.post("/", isAuthenticated, isAuthorized('create', Property.name), reqFile.fields([
         { name: 'mainImage', maxCount: 1 },
         { name: 'otherImages', maxCount: 10 }
 ]), createProperty);
