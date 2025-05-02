@@ -30,6 +30,8 @@ export const updateBasicInfo = async (req: Request, res: Response, next: NextFun
             contactEmail: req.body.contactEmail,
             contactPhone: req.body.contactPhone,
             basicInfoUpdatedAt: moment(),
+            companyName: req.body.companyName,
+            companyLocation: req.body.companyLocation,
             role: req.body.role || user.role || 'agent',
         }, {
             where: {

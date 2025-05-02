@@ -26,7 +26,7 @@ export const useGoogleStrategy = new GoogleStrategy({
 )
 
 
-export const isAuthenticated =  (req: Request, res: Response, next: NextFunction) => {
+export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
 
     const authHeader = req.headers.authorization;
 
@@ -42,8 +42,13 @@ export const isAuthenticated =  (req: Request, res: Response, next: NextFunction
 
         console.log("isAuthenticated method called")
         const decoded = jwt.verify(token, appKey);
-        const user = decoded as User;
-        console.log("decoded => ", user)
+        const decodedUser = decoded as User;
+        const user = await User.findByPk(decodedUser.id)
+        if (!user) {
+            res.status(401).json({ message: "Authentication required" });
+            return
+        }
+        // console.log("authenticated user: ", user);
         req.user = user
         next()
 

@@ -23,6 +23,12 @@ class Package extends Model {
     @Attribute(DataTypes.DOUBLE)
     price?: number;
 
+    @Attribute(DataTypes.STRING)
+    frequency?: "daily" | "one_time";
+
+    @Attribute(DataTypes.STRING)
+    group?: "default" | "properties_promotion" | "advertisement";
+
 }
 
 export default Package;

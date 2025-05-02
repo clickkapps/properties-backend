@@ -22,7 +22,7 @@ class Subscription extends Model {
     declare serviceType?: CreationOptional<string>
 
     @Attribute(DataTypes.STRING)
-    declare status?: CreationOptional<string>
+    declare status?: CreationOptional<string> // pending | active | invalid
 
     @Attribute(DataTypes.STRING)
     declare subscriptionType?: CreationOptional<string>

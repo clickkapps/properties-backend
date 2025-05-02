@@ -10,12 +10,11 @@ import PropertyCategory from "../models/PropertyCategory";
 import {
     addPropertyGallery,
     addPropertySpecifications,
-    attachedPropertyRelationships,
     getPropertyById
 } from "../traits/properties.trait";
-import moment from "moment";
 import {defineAbilitiesFor} from "../helpers/defineAbility";
 import {permissionActions, permissionSubjects} from "../helpers/constants";
+import PromotedProperty from "../models/PromotedProperty";
 
 
 
@@ -49,7 +48,7 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
         const mainImage = files?.mainImage?.[0];
         const otherImages = files?.otherImages || [];
 
-        const { propertyCategoryId,
+        const { categoryId,
             title,
             description,
             specifications,
@@ -63,7 +62,7 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             washrooms
         } = req.body
 
-        if(!title || !description || !propertyCategoryId || !country || !region || !currency || !amount) {
+        if(!title || !description || !categoryId || !country || !region || !currency || !amount) {
             apiResponse = { message: "Invalid request" };
             res.status(400).send(apiResponse)
             return;
@@ -79,7 +78,7 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
 
         // create the property
         const created = await Property.create({
-            propertyCategoryId,
+            categoryId,
             userId: ownerId,
             creatorId: creatorId,
             title,
@@ -118,9 +117,31 @@ export const updateProperty = async(req: Request, res: Response, next: NextFunct
 
     try {
 
-        const { id } = req.params;
-        const property = await Property.findByPk(id)
         let apiResponse: ApiResponse
+        const { id } = req.params;
+
+        const { categoryId,
+            title, description,
+            specifications,
+            offerType,
+            amount,
+            currency,
+            address,
+            country,
+            region,
+            rooms,
+            washrooms
+        } = req.body
+
+        if(!title || !description || !categoryId || !country || !region || !currency || !amount) {
+            apiResponse = { message: "Invalid request" };
+            res.status(400).send(apiResponse)
+            return;
+        }
+
+
+        const property = await Property.findByPk(id)
+
 
         if (!property) {
             console.log("updatedProperty called, id=", id);
@@ -142,22 +163,9 @@ export const updateProperty = async(req: Request, res: Response, next: NextFunct
 
         // you can only add to specifications in the updateProperty function. Separate method to delete specification
 
-        const { propertyCategoryId,
-            title, description,
-            specifications,
-            offerType,
-            amount,
-            currency,
-            address,
-            country,
-            region,
-            rooms,
-            washrooms
-        } = req.body
-
 
         await property.update({
-            propertyCategoryId,
+            categoryId,
             title: title || property?.title,
             description: description || property?.description,
             mainImagePath: mainImagePath,
@@ -235,12 +243,12 @@ export const publishProperty = async(req: Request, res: Response, next: NextFunc
 
         const userId = (req.user as User).id
 
-        await property.update({
+        const updatedProperty = await property.update({
             published: true,
             publisherId: userId,
             publishedAt: new Date()
         })
-        apiResponse = { message: "Property deleted", data: await getPropertyById(property.id) }
+        apiResponse = { message: "Property published!", data: updatedProperty }
         res.status(200).json(apiResponse)
 
 
@@ -265,12 +273,12 @@ export const unPublishProperty = async(req: Request, res: Response, next: NextFu
             return
         }
 
-        await property.update({
+        const updatedProperty = await property.update({
             published: false,
             publisherId: null,
             publishedAt: null
         })
-        apiResponse = { message: "Property unpublished", data: await getPropertyById(property.id) }
+        apiResponse = { message: "Property unpublished", data: updatedProperty }
         res.status(200).json(apiResponse)
 
 
@@ -280,35 +288,74 @@ export const unPublishProperty = async(req: Request, res: Response, next: NextFu
 }
 
 
-const propertiesQueryWhere = (req: Request) => {
+export const deleteOtherImage = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { userId, published  } = req.body
+    try {
 
-    const where: any = {}
+        const { id } = req.params
 
-    if (published === 'false' || published === undefined) {
+        let apiResponse: ApiResponse
 
-        const user = req.user as User
-
-        if(!user) {
-            throw new Error('Forbidden')
+        const image = await PropertyGallery.findByPk(id)
+        if (!image) {
+            apiResponse = { message: "Invalid request" }
+            res.status(400).json(apiResponse)
+            return
         }
 
-        const ability = defineAbilitiesFor(user);
+        await image.destroy()
+        apiResponse = { message: "Successfully deleted image" }
+        res.status(200).json(apiResponse)
 
-        if(ability.cannot(permissionActions.read, permissionSubjects.unpublishedProperties)) {
-            throw new Error('Forbidden')
-        }
-
-        // check if user is not admin, then return properties of that user
-    } else {
-
-        where.published = true;
-
+    }catch (error) {
+        next(error);
     }
 
-    if (userId !== undefined) {
-        where.userId = +userId;
+
+}
+
+export const deletePropertySpecification = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const { id  } = req.params
+        let apiResponse: ApiResponse
+        const specification = await PropertySpecification.findByPk(id)
+
+        if (!specification) {
+            apiResponse = { message: "Invalid request" }
+            res.status(400).json(apiResponse)
+            return
+        }
+
+        await specification.destroy()
+
+        apiResponse = { message: "Successfully deleted image" }
+
+
+        res.status(200).json(apiResponse)
+
+
+    }catch (e) {
+        next(e)
+    }
+
+}
+
+const propertiesWithAuthorizationWhereQueryBuilder = (req: Request) => {
+    const { userId, published } = req.query
+    const user = req.user as User
+
+    const where: any = {}
+    if(userId) {
+        where.userId = userId
+    }
+
+    const ability = defineAbilitiesFor(user);
+
+    if(!ability.can(permissionActions.read, permissionSubjects.unpublishedProperties)
+        || !ability.can(permissionActions.read, permissionSubjects.publishedProperties)) {
+        throw new Error('Unauthorized')
     }
 
     return where
@@ -319,7 +366,7 @@ export const countProperties = async(req: Request, res: Response, next: NextFunc
 
     try {
 
-        const where = propertiesQueryWhere(req)
+        const where = propertiesWithAuthorizationWhereQueryBuilder(req)
 
         const count = await Property.count({
             where: where
@@ -337,12 +384,11 @@ export const countProperties = async(req: Request, res: Response, next: NextFunc
     }
 }
 
-export const getProperties = async(req: Request, res: Response, next: NextFunction) => {
+export const getPropertiesWithAuthorization = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
 
-        const where = propertiesQueryWhere(req)
-
+        const where = propertiesWithAuthorizationWhereQueryBuilder(req)
 
         const properties = await Property.findAll( {
             where: where,
@@ -372,6 +418,16 @@ export const getProperties = async(req: Request, res: Response, next: NextFuncti
     }catch (error) {
         next(error);
     }
+}
+
+export const getPropertiesNoAuthorization = async(req: Request, res: Response, next: NextFunction) => {
+    const properties = await Property.findAll( {
+        where: {
+            published: true
+        },
+        order: [['createdAt', 'DESC']],
+    });
+    res.status(200).json({ message: "success", data: properties })
 }
 
 export const removePropertySpecification = async(req: Request, res: Response, next: NextFunction) => {
@@ -524,4 +580,68 @@ export const updatePropertyCategory = async (req: Request, res: Response, next: 
     }catch (error) {
         next(error);
     }
+}
+
+
+export const postPromoteProperty = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const { propertyId, subscriptionId } = req.body;
+        const user = req.user as User;
+
+        if(!propertyId || !subscriptionId){
+            res.status(400).send({message: "invalid request"})
+            return
+        }
+
+        const property = await Property.findOne({
+            where: {
+                id: propertyId
+            }
+        })
+
+        if(!property){
+            res.status(400).send({message: "invalid request"})
+            return
+        }
+
+        if(!property?.published) {
+            res.status(400).send({message: "Unpublished property"})
+            return
+        }
+
+        await PromotedProperty.create({
+            propertyId: propertyId,
+            subscriptionId: subscriptionId,
+            userId: user.id,
+        })
+
+        await property.update({
+            promoted: true
+        })
+
+        res.status(201).json({message: "success"})
+
+    }catch (error) {
+        next(error);
+    }
+}
+
+
+// Search requirements
+export const getPropertySearchRequirement = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const categories = await PropertyCategory.findAll()
+
+        let apiResponse: ApiResponse = { message: "success", data: {
+                categories
+            } };
+        res.status(200).json(apiResponse)
+
+    }catch (error) {
+        next(error);
+    }
+
 }

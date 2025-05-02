@@ -25,6 +25,11 @@ module.exports = {
         defaultValue: null,
         onDelete: 'CASCADE',
       },
+      verb: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
+      },
       action: {
         type: Sequelize.STRING,
         allowNull: true,

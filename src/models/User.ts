@@ -57,6 +57,12 @@ class User extends Model {
     @Attribute(DataTypes.BOOLEAN)
     requiresPasswordUpdate?: boolean;
 
+    @Attribute(DataTypes.STRING)
+    companyName?: CreationOptional<string>
+
+    @Attribute(DataTypes.STRING)
+    companyLocation?: CreationOptional<string>
+
     static sensitiveProperties: string[] = [ 'password', 'secreteKey' ]
     static optionalForAssociations: string[] = [ ...User.sensitiveProperties, 'lastLoginAt', 'currentLoginAt', 'publicKey', 'loginId', 'currentLoginAt','createdAt', 'updatedAt', 'basicInfoUpdatedAt' ]
 

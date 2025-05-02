@@ -17,3 +17,21 @@ export const permissionSubjects = {
     publishedProperties: "published properties",
     ads: "advertisements",
 }
+
+export const ghRegions = [
+    "Greater Accra",
+    "Ashanti",
+    "Bono East",
+    "Central",
+    "Eastern",
+    "Northern",
+    "Savannah",
+    "Oti",
+    "Ahafo",
+    "Upper East",
+    "Upper West",
+    "Western",
+    "Western North",
+    "Volta",
+    "North East",
+]

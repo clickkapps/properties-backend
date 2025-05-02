@@ -1,7 +1,7 @@
 export interface CreateSubscriptionPayload {
 
     userId: number,
-    serviceType: string,
+    serviceType: "properties_promotion" | "advertisement",
     subscriptionType?: string,
     amountPayable?: number
 }

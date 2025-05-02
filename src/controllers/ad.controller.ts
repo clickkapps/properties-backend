@@ -1,16 +1,16 @@
 import {NextFunction, Request, Response} from "express";
 import {storage} from "../helpers/storage";
+import Advertisement from "../models/Advertisement";
 import User from "../models/User";
-import {ApiResponse} from "../types/shared.types";
 
-export const createProperty = async(req: Request, res: Response, next: NextFunction) => {
+export const postNewAdvertisement = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
 
-        const creatorId = (req.user as User).id
-        let apiResponse: ApiResponse
+        const user = req.user as User
 
         const {
+            subscriptionId,
             startDate,
             endDate,
             contactPhone,
@@ -18,9 +18,8 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             link,
         } = req.body
 
-        if(!startDate || !endDate) {
-            apiResponse = { message: "Invalid request" };
-            res.status(400).send(apiResponse)
+        if(!startDate || !endDate || !subscriptionId) {
+            res.status(400).send({ message: "Invalid request" })
             return;
         }
 
@@ -38,7 +37,19 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             mainImagePath = `${uploadedFile.generatedFilePath}?mimeType=${uploadedFile.mimeType}`
         }
 
+        await Advertisement.create({
+            userId: user.id,
+            status: "active",
+            subscriptionId: subscriptionId,
+            startFrom: startDate,
+            endAt: endDate,
+            contactPhone: contactPhone,
+            contactEmail: contactEmail,
+            imagePath: mainImagePath,
+            link: link,
+        })
 
+        res.status(200).send({message: "Advertisement successfully created"})
 
     }catch (error) {
         next(error)

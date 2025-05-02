@@ -36,10 +36,10 @@ export class Property  extends  Model {
 
     @Attribute(DataTypes.INTEGER)
     @ColumnName('categoryId')
-    declare propertyCategoryId?: number
+    declare categoryId?: number
 
     @BelongsTo(() => PropertyCategory, 'categoryId')
-    declare propertyCategory?: NonAttribute<PropertyCategory>;
+    declare category?: NonAttribute<PropertyCategory>;
 
     @Attribute(DataTypes.STRING)
     declare title?: CreationOptional<string>
@@ -50,7 +50,7 @@ export class Property  extends  Model {
     @Attribute(DataTypes.STRING)
     declare mainImagePath?: string
 
-    @Attribute(DataTypes.ENUM(['rent', 'rent']))
+    @Attribute(DataTypes.ENUM(['rent', 'sale']))
     declare offerType?: 'rent' | 'sale'
 
     @Attribute(DataTypes.STRING)
@@ -97,6 +97,10 @@ export class Property  extends  Model {
 
     @Attribute(DataTypes.INTEGER)
     declare kitchens?: number
+
+    @Attribute(DataTypes.BOOLEAN)
+    @Default(false)
+    declare promoted: CreationOptional<boolean>
 
 }
 

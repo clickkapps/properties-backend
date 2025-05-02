@@ -10,8 +10,10 @@ import agentRoutes from "./routes/agent.routes";
 import packageRoutes from "./routes/package.routes";
 import {get404, get500} from "./controllers/errors.controller";
 import propertyRoutes from "./routes/property.routes";
+import subscriptionRoutes from "./routes/subscription.routes";
 import {logIncomingRequests} from "./middlewares/monitor.middleware";
 import cors, {CorsOptions} from "cors";
+import adRoutes from "./routes/ad.routes";
 
 const app = express()
 app.use(bodyParser.json())
@@ -51,6 +53,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/users', isAuthenticated, userRoutes)
 app.use('/api/packages', packageRoutes)
 app.use('/api/properties', propertyRoutes )
+app.use('/api/subscription', subscriptionRoutes )
+app.use('/api/advertisements', adRoutes )
 
 app.get('api/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})

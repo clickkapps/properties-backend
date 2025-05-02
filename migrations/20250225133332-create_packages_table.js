@@ -32,7 +32,7 @@ module.exports = {
       currency: {
         type: Sequelize.STRING(10),
         allowNull: true,
-        defaultValue: "USD"
+        defaultValue: "GHS"
       },
       createdAt: {
         type: Sequelize.DATE,

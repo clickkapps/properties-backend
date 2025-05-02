@@ -2,18 +2,24 @@ import { Router } from 'express'
 import {
         createProperty,
         createPropertyCategory,
-        getProperties,
+        deleteOtherImage,
+        deletePropertySpecification,
+        getPropertiesNoAuthorization,
+        getPropertiesWithAuthorization,
         getPropertyCategories,
-        getPropertyDetail,
+        getPropertyDetail, postPromoteProperty, publishProperty,
+
         removeProperty,
-        removePropertyCategory, removePropertyGallery,
-        removePropertySpecification,
+        removePropertyCategory,
+        removePropertyGallery,
+        removePropertySpecification, unPublishProperty,
         updateProperty,
         updatePropertyCategory
 } from "../controllers/properties.controller";
 import {reqFile} from "../helpers/utils";
 import {isAuthenticated, isAuthorized} from "../middlewares/auth.middleware";
 import Property from "../models/Property";
+import {permissionActions, permissionSubjects} from "../helpers/constants";
 
 const router = Router()
 
@@ -40,13 +46,19 @@ router.use('/categories', categoriesRouter);
 router.use('/specifications', specificationsRouter);
 router.use('/gallery', galleryRouter);
 
-router.get("/", getProperties)
-router.post("/", isAuthenticated, isAuthorized('create', Property.name), reqFile.fields([
+router.get("/", isAuthenticated, getPropertiesWithAuthorization)
+router.get("/public", getPropertiesNoAuthorization)
+router.post("/", isAuthenticated, isAuthorized(permissionActions.create, permissionSubjects.properties), reqFile.fields([
         { name: 'mainImage', maxCount: 1 },
         { name: 'otherImages', maxCount: 10 }
 ]), createProperty);
 router.get("/:id", getPropertyDetail)
 router.delete("/:id", isAuthenticated, removeProperty)
+router.delete("/specification/:id", isAuthenticated, deletePropertySpecification)
+router.delete("/other-image/:id", isAuthenticated, deleteOtherImage)
+router.put("/publish/:id", isAuthenticated, publishProperty)
+router.put("/unpublish/:id", isAuthenticated, unPublishProperty)
+router.post("/promote", isAuthenticated, postPromoteProperty)
 
 router.put("/:id", isAuthenticated, reqFile.fields([
         { name: 'mainImage', maxCount: 1 },

@@ -1,4 +1,5 @@
 Create Migration: npx sequelize-cli migration:generate --name migration-skeleton
+Create Seed: npx sequelize-cli seed:generate --name seed-name-seeder
 
 Flow of application.
 1. A agent signs up / sign in

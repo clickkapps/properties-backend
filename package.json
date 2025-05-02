@@ -12,7 +12,8 @@
     "migrate:rollback": "npx sequelize-cli db:migrate:undo",
     "migrate:clear": "npx sequelize-cli db:migrate:undo:all",
     "seed": "npx sequelize-cli db:seed:all",
-    "seed:rollback": "npx sequelize-cli db:seed:undo"
+    "seed:rollback": "npx sequelize-cli db:seed:undo",
+    "seed:clear": "npx sequelize-cli db:seed:undo:all"
   },
   "keywords": [],
   "author": "",

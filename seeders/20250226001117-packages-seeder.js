@@ -9,30 +9,48 @@ module.exports = {
         {
           slug: "basic",
           name: "Basic",
+          group: "default",
+          frequency: "one_time",
           description: "Start plan",
           price: 100,
-          currency: "USD",
+          currency: "GHS",
           createdAt: moment().toDate(),
           updatedAt: moment().toDate()
         },
        {
           slug: "standard",
           name: "Standard",
+          group: "default",
+          frequency: "one_time",
           description: "Standard plan",
           price: 200,
-          currency: "USD",
+          currency: "GHS",
           createdAt: moment().toDate(),
           updatedAt: moment().toDate()
        },
-      {
-          slug: "premium",
-          name: "Premium",
-          description: "Premium plan",
-          price: 350,
-          currency: "USD",
-          createdAt: moment().toDate(),
-          updatedAt: moment().toDate()
-      },
+        {
+            slug: "properties_promotion",
+            name: "Properties Promotion",
+            group: "properties_promotion",
+            frequency: "daily",
+            description: "Package for promoting properties",
+            price: 20,
+            currency: "GHS",
+            createdAt: moment().toDate(),
+            updatedAt: moment().toDate()
+        },
+        {
+            slug: "advertisement",
+            name: "Advertisement",
+            group: "advertisement",
+            frequency: "daily",
+            description: "Package for advertising on the website",
+            price: 15,
+            currency: "GHS",
+            createdAt: moment().toDate(),
+            updatedAt: moment().toDate()
+        }
+
     ])
     /**
      * Add seed commands here.

@@ -19,13 +19,13 @@ class Advertisement extends Model{
     declare user?: NonAttribute<User>;
 
     @Attribute(DataTypes.STRING)
-    declare status?: string
+    declare status?: string //  active, completed
 
     @Attribute(DataTypes.DATE)
-    declare startDate?: Date
+    declare startFrom?: Date
 
     @Attribute(DataTypes.DATE)
-    declare endDate?: Date
+    declare endAt?: Date
 
     @Attribute(DataTypes.STRING)
     declare contactPhone?: string

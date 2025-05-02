@@ -21,7 +21,7 @@ export const attachedPropertyRelationships = [{
             ...User.optionalForAssociations,
         ]
     }
-}, 'propertyCategory', 'specifications', 'gallery']
+}, 'category', 'specifications', 'gallery']
 
 
 export const addPropertyGallery = async (propertyId: number, otherImages: Express.Multer.File[]) => {
