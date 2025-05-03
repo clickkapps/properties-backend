@@ -24,10 +24,13 @@ class Package extends Model {
     price?: number;
 
     @Attribute(DataTypes.STRING)
+    currency?: string;
+
+    @Attribute(DataTypes.STRING)
     frequency?: "daily" | "one_time";
 
     @Attribute(DataTypes.STRING)
-    group?: "default" | "properties_promotion" | "advertisement";
+    group?: "entitlement" | "properties_promotion" | "advertisement";
 
 }
 

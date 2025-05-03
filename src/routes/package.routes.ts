@@ -3,6 +3,6 @@ import {getPackages} from "../controllers/packages.controller";
 
 const router = Router()
 
-router.get('/all', getPackages)
+router.get('/', getPackages)
 
 export default router

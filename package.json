@@ -26,6 +26,7 @@
     "@sequelize/core": "^7.0.0-alpha.42",
     "@sequelize/mysql": "^7.0.0-alpha.46",
     "@sequelize/postgres": "^7.0.0-alpha.45",
+    "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",

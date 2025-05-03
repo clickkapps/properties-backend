@@ -9,9 +9,9 @@ module.exports = {
         {
           slug: "basic",
           name: "Basic",
-          group: "default",
+          group: "entitlement",
           frequency: "one_time",
-          description: "Start plan",
+          description: "Basic plan",
           price: 100,
           currency: "GHS",
           createdAt: moment().toDate(),
@@ -20,7 +20,7 @@ module.exports = {
        {
           slug: "standard",
           name: "Standard",
-          group: "default",
+          group: "entitlement",
           frequency: "one_time",
           description: "Standard plan",
           price: 200,

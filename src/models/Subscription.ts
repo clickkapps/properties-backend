@@ -18,7 +18,7 @@ class Subscription extends Model {
     @BelongsTo(() => User, 'userId')
     declare user?: NonAttribute<User>;
 
-    @Attribute(DataTypes.STRING)
+    @Attribute(DataTypes.STRING) // same as package slug
     declare serviceType?: CreationOptional<string>
 
     @Attribute(DataTypes.STRING)
@@ -26,6 +26,9 @@ class Subscription extends Model {
 
     @Attribute(DataTypes.STRING)
     declare subscriptionType?: CreationOptional<string>
+
+    @Attribute(DataTypes.STRING)
+    declare currency?: string
 
     @Attribute(DataTypes.DOUBLE)
     declare amountPayable?: CreationOptional<number>;
@@ -38,6 +41,13 @@ class Subscription extends Model {
 
     @Attribute(DataTypes.DATE)
     declare endDate?: CreationOptional<Date>;
+
+    @Attribute(DataTypes.STRING)
+    declare serverId?: string
+
+    @Attribute(DataTypes.STRING)
+    declare payload?: string
+
 
 
 }

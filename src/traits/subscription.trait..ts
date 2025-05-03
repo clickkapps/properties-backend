@@ -3,19 +3,23 @@ import Subscription from "../models/Subscription";
 import User from "../models/User";
 import moment from "moment";
 import Package from "../models/Package";
+import {generateKey} from "../helpers/utils";
+import https from "https";
+import axios from 'axios'
+import subscription from "../models/Subscription";
 
 type BillingPriceParams = {
-    serviceType: "properties_promotion" | "advertisement" | "basic_package" | "standard_package";
+    packageSlug: "properties_promotion" | "advertisement" | "basic_package" | "standard_package";
     startDate?: string,
     endDate?: string,
 }
 
-export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{amountToPay: number, frequency: "daily"|"one_time"}> => {
+export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{amountToPay: number, frequency: "daily"|"one_time", currency: string | undefined}> => {
 
-    if(args.serviceType === "basic_package") {
+    if(args.packageSlug === "basic_package") {
         const pkg = await Package.findOne({
             where: {
-                group: "default",
+                group: "entitlement",
                 slug: "basic",
             }
         })
@@ -25,13 +29,14 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
         return {
             amountToPay: pkg.price,
             frequency: pkg.frequency,
+            currency: pkg.currency
         }
     }
 
-    if(args.serviceType === "standard_package") {
+    if(args.packageSlug === "standard_package") {
         const pkg = await Package.findOne({
             where: {
-                group: "default",
+                group: "entitlement",
                 slug: "standard",
             }
         })
@@ -41,16 +46,17 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
         return {
             amountToPay: pkg.price,
             frequency: pkg.frequency,
+            currency: pkg.currency
         }
     }
 
-    if(args.serviceType === "properties_promotion") {
+    if(args.packageSlug === "properties_promotion") {
 
         if(!args.startDate || !args.endDate) {
             throw new Error("Invalid date range");
         }
 
-        const diffInDays = moment(args.startDate).diff(moment(args.endDate), "days");
+        const diffInDays = Math.abs(moment(args.endDate).diff(moment(args.startDate), "days"));
 
         const pkg = await Package.findOne({
             where: {
@@ -68,12 +74,13 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
         const totalPrice = pkg.price * diffInDays;
         return {
             amountToPay: totalPrice,
-            frequency: "daily"
+            frequency: "daily",
+            currency: pkg.currency
         }
 
     }
 
-    if(args.serviceType === "advertisement") {
+    if(args.packageSlug === "advertisement") {
 
         if(!args.startDate || !args.endDate) {
             throw new Error("Invalid date range");
@@ -97,7 +104,8 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
         const totalPrice = pkg.price * diffInDays;
         return {
             amountToPay: totalPrice,
-            frequency: "daily"
+            frequency: "daily",
+            currency: pkg.currency
         }
     }
 
@@ -107,41 +115,127 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
 }
 
 
-export const createSubscription = async (payload: CreateSubscriptionPayload, sendInvoice: boolean = true) => {
+export const createSubscription = async (user: User, args: CreateSubscriptionPayload, sendInvoice: boolean = true) => {
 
+    const serverId = generateKey()
     // create subscription
-    // we use findOrCreate so that we can use this same method to RESEND invoice for the subscription
-    const subscription = await Subscription.findOrCreate({
-        where: {
-            userId: payload.userId,
-            serviceType: payload.serviceType,
-            status: 'pending'
-        },
-        defaults: {
-            ...payload
-        }
+    const subscription = await Subscription.create({
+        ...args,
+        userId: args.userId,
+        serviceType: args.packageSlug,
+        status: 'pending',
+        serverId: serverId,
     },)
 
-    if(sendInvoice) {
-        // send invoice to user
-        const user = User.findByPk(payload.userId)
-    }
+    // if(sendInvoice) {
+    //     // send invoice to user
+    //     const user = User.findByPk(payload.userId)
+    // }
 
-    return subscription
+    // const checkoutPayload = await generatePaymentCheckout(user, subscription)
+    // const existingSubPld = subscription.payload ? JSON.parse(subscription.payload) : { }
+    // let checkoutUrl = undefined
+    // if(checkoutPayload && checkoutPayload.data) {
+    //     existingSubPld.paystackCheckoutPayload = checkoutPayload.data
+    //     checkoutUrl = checkoutPayload.data['authorization_url']
+    //
+    // }
+    // await subscription.update({
+    //     payload: JSON.stringify(existingSubPld),
+    // })
+
+    return {
+        reference: subscription.serverId,
+        amount: (subscription.amountPayable || 0) * 100,
+        email: user.contactEmail || process.env.AMIN_DEFAULT_EMAIL,
+        pk: process.env.PAYMENT_PUBLIC_KEY,
+        currency: subscription.currency
+    }
 
 }
 
-export const updateSubscription = async (id: number, payload: UpdateSubscriptionPayload) => {
 
-    // create subscription
-    await Subscription.update({
-        ...payload
-    }, {
-        where: {
-            id: payload.id
+export const verifyPayment = async (reference: string) => {
+
+    const response = await axios.get(`${process.env.PAYMENT_BASE_URL}/transaction/verify/${reference}`, {
+        headers: {
+            Authorization: `Bearer ${process.env.PAYMENT_SECRET_KEY}`,
+            'Content-Type': 'application/json'
+        },
+    })
+
+    const responseData = await response.data
+
+    if(responseData && responseData.data) {
+
+        const subscription = await Subscription.findOne({
+            where: {
+                serverId: reference,
+                status: "pending"
+            }
+        })
+
+         await subscription?.update({
+            status: responseData.data.status,
+         })
+
+        return {
+            status: responseData.data.status,
+            subId: subscription?.id,
+            extra: subscription?.payload ? JSON.parse(subscription.payload) : undefined,
+        }
+
+    }
+
+    return {
+        status: "unknown"
+    }
+
+}
+
+const generatePaymentCheckout = async (user: User, subscription: Subscription) => {
+
+    const postData = JSON.stringify({
+        email: user.contactEmail || process.env.AMIN_DEFAULT_EMAIL,
+        amount: (subscription.amountPayable || 0) * 100,
+        reference: subscription.serverId,
+        metadata: {
+            "cancel_action": process.env.WEB_APP_URL
         }
     })
 
+    const options = {
+        hostname: process.env.PAYMENT_HOSTNAME,
+        port: process.env.PAYMENT_PORT,
+        path: process.env.PAYMENT_PATH,
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${process.env.PAYMENT_SECRET_KEY}`,
+            'Content-Type': 'application/json'
+        }
+    }
+
+    return await new Promise<any>((resolve, reject) => {
+        const req = https.request(options, res => {
+            let data = ''
+
+            res.on('data', chunk => {
+                data += chunk
+            })
+
+            res.on('end', () => {
+                try {
+                    resolve(JSON.parse(data))
+                } catch (err) {
+                    reject(err)
+                }
+            })
+        })
+
+        req.on('error', err => reject(err))
+        req.write(postData)
+        req.end()
+    })
 }
 
 

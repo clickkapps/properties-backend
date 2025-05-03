@@ -1,9 +1,11 @@
 import {Router} from "express";
-import {getBill, postInitiateSubscription} from "../controllers/subscriptions.controller";
+import {getBill, checkSubscriptionStatus, postProcessSubscription} from "../controllers/subscriptions.controller";
+import {isAuthenticated} from "../middlewares/auth.middleware";
 
 const router = Router()
 
-router.post('/bill', getBill)
-router.post('/initiate', postInitiateSubscription)
+router.post('/bill', isAuthenticated, getBill)
+router.post('/process', isAuthenticated, postProcessSubscription)
+router.get('/status/:reference', checkSubscriptionStatus)
 
 export default router

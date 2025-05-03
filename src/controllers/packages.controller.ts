@@ -4,7 +4,20 @@ import {ApiResponse} from "../types/shared.types";
 
 export const getPackages = async(req: Request, res: Response) => {
 
-    const packages = await Package.findAll()
+    const { group } = req.query;
+
+    const where: any = {}
+    if(group) {
+        if(group !== "all"){
+            where["group"] = group
+        }
+    }else  {
+        where["group"] = "entitlement"
+    }
+
+    const packages = await Package.findAll({
+        where: where,
+    })
     const apiResponse: ApiResponse = {
         data: packages
     }
