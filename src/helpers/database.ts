@@ -10,6 +10,8 @@ import SubscribedPackage from "../models/SubscribedPackage";
 import Subscription from "../models/Subscription";
 import OTP from "../models/OTP";
 import {PostgresDialect} from "@sequelize/postgres";
+import UserEntitlement from "../models/UserEntitlement";
+import Advertisement from "../models/Advertisement";
 
 
 const dbHost = process.env.DB_HOST || '';
@@ -30,7 +32,7 @@ const sequelize = new Sequelize({
         User, Package, PromotedProperty,
         Property, PropertyCategory, PropertyGallery,
         PropertySpecification, SubscribedPackage,
-        Subscription, OTP
+        Subscription, OTP, UserEntitlement, Advertisement
     ]
 })
 

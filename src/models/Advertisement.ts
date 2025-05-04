@@ -19,7 +19,7 @@ class Advertisement extends Model{
     declare user?: NonAttribute<User>;
 
     @Attribute(DataTypes.STRING)
-    declare status?: string //  active, completed
+    declare status?: "pending" | "approved" | "active" | "inactive" //  pending, approved, active, inactive
 
     @Attribute(DataTypes.DATE)
     declare startFrom?: Date

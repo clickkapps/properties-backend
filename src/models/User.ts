@@ -1,9 +1,11 @@
 import {
     CreationOptional,
     DataTypes,
-    Model, Sequelize,
+    Model, NonAttribute, Sequelize,
 } from "@sequelize/core";
-import {Table, Attribute, PrimaryKey, AutoIncrement} from '@sequelize/core/decorators-legacy';
+import {Table, Attribute, PrimaryKey, AutoIncrement, HasMany, HasOne} from '@sequelize/core/decorators-legacy';
+import PropertySpecification from "./PropertySpecification";
+import UserEntitlement from "./UserEntitlement";
 
 @Table
 class User extends Model {
@@ -62,6 +64,17 @@ class User extends Model {
 
     @Attribute(DataTypes.STRING)
     companyLocation?: CreationOptional<string>
+
+    @HasMany(() => UserEntitlement, 'userId')
+    declare entitlementHistory?: NonAttribute<UserEntitlement[]>;
+
+    @HasOne(() => UserEntitlement, {
+        foreignKey: 'userId',
+        scope: {
+            status: 'active',
+        },
+    })
+    declare activeEntitlement?: NonAttribute<UserEntitlement>;
 
     static sensitiveProperties: string[] = [ 'password', 'secreteKey' ]
     static optionalForAssociations: string[] = [ ...User.sensitiveProperties, 'lastLoginAt', 'currentLoginAt', 'publicKey', 'loginId', 'currentLoginAt','createdAt', 'updatedAt', 'basicInfoUpdatedAt' ]

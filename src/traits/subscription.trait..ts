@@ -86,7 +86,7 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
             throw new Error("Invalid date range");
         }
 
-        const diffInDays = moment(args.startDate).diff(moment(args.endDate), "days");
+        const diffInDays = Math.abs(moment(args.endDate).diff(moment(args.startDate), "days"));
 
         const pkg = await Package.findOne({
             where: {
@@ -177,6 +177,7 @@ export const verifyPayment = async (reference: string) => {
 
          await subscription?.update({
             status: responseData.data.status,
+            amountPaid: responseData.data.status === "success" ? subscription.amountPayable : subscription.amountPaid,
          })
 
         return {
