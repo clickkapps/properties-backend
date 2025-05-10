@@ -1,3 +1,4 @@
+// for the databse migration
 require('dotenv').config();
 module.exports = {
   "development": {

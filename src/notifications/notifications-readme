@@ -1,16 +1,16 @@
-npm install nodemailer ejs
-npm install --save-dev @types/nodemailer @types/ejs
-npm install -D @maizzle/cli // for compiling tailwind into email template
-npm install -D @maizzle/framework tailwindcss postcss autoprefixer
+Email installation:
 
-- to notify
 
-import { notify } from './notifications/dispatcher';
+Use tailwind installation to install POST CSS in tailwind
+npm install -D @maizzle/cli @maizzle/framework
+use maizzle.config.js
+use emails/src/*.html
+change content of tailwind.config.js
+     content: [
+            './emails/src/**/*.html',
+        ],
+add this "build:email": "npx maizzle build"
+    to package json
 
-notify({
-  to: 'user@example.com',
-  channel: 'email',
-  subject: 'Welcome!',
-  templateName: 'welcome',
-  variables: { name: 'Daniel' }
-});
+
+

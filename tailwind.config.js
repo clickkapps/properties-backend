@@ -1,9 +1,12 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
-        './src/notifications/templates/**/*.html',
+        './emails/src/**/*.html',
     ],
     theme: {
         extend: {},
     },
-    plugins: [],
+    corePlugins: {
+        preflight: false, // Disable Tailwind's CSS reset (for email compatibility)
+    },
 }
