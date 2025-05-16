@@ -14,34 +14,34 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    return queryInterface.bulkInsert('Users', [
-      {
-        firstName: 'Super',
-        lastName: 'Admin',
-        loginId: 'admin@properties.com',
-        contactEmail: 'clickk.properties.dev@gmail.com',
-        contactPhone: 'clickk.properties.dev@gmail.com',
-        requiresPasswordUpdate: true,
-        basicInfoUpdatedAt: new Date(),
-        role: 'admin',
-        password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        firstName: 'Developer',
-        lastName: 'Admin',
-        loginId: 'dev@properties.com',
-        contactEmail: 'clickk.properties.dev@gmail.com',
-        contactPhone: 'clickk.properties.dev@gmail.com',
-        requiresPasswordUpdate: false,
-        basicInfoUpdatedAt: new Date(),
-        role: 'admin',
-        password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ], { })
+    // return queryInterface.bulkInsert('Users', [
+      // {
+      //   firstName: 'Super',
+      //   lastName: 'Admin',
+      //   loginId: 'admin@properties.com',
+      //   contactEmail: 'clickk.properties.dev@gmail.com',
+      //   contactPhone: 'clickk.properties.dev@gmail.com',
+      //   requiresPasswordUpdate: true,
+      //   basicInfoUpdatedAt: new Date(),
+      //   role: 'admin',
+      //   password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // },
+      // {
+      //   firstName: 'Developer',
+      //   lastName: 'Admin',
+      //   loginId: 'dev@properties.com',
+      //   contactEmail: 'clickk.properties.dev@gmail.com',
+      //   contactPhone: 'clickk.properties.dev@gmail.com',
+      //   requiresPasswordUpdate: false,
+      //   basicInfoUpdatedAt: new Date(),
+      //   role: 'admin',
+      //   password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // },
+    // ], { })
   },
 
   async down (queryInterface, Sequelize) {
@@ -52,13 +52,13 @@ module.exports = {
      * await queryInterface.bulkDelete('People', null, {});
      */
 
-    return queryInterface.bulkDelete('Users', null, {
-      where: {
-        [Op.or]: [
-          { loginId: 'admin@properties.com'},
-          { loginId: 'dev@properties.com'},
-        ]
-      }
-    } )
+    // return queryInterface.bulkDelete('Users', null, {
+    //   where: {
+    //     [Op.or]: [
+    //       { loginId: 'admin@properties.com'},
+    //       { loginId: 'dev@properties.com'},
+    //     ]
+    //   }
+    // } )
   }
 };

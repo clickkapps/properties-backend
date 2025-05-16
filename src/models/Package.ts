@@ -30,7 +30,7 @@ class Package extends Model {
     frequency?: "daily" | "one_time";
 
     @Attribute(DataTypes.STRING)
-    group?: "entitlement" | "properties_promotion" | "advertisement";
+    group?: "entitlement" | "properties_promotion" | "advertisement" | "pr";
 
 }
 

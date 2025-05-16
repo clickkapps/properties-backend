@@ -12,6 +12,8 @@ import OTP from "../models/OTP";
 import {PostgresDialect} from "@sequelize/postgres";
 import UserEntitlement from "../models/UserEntitlement";
 import Advertisement from "../models/Advertisement";
+import PasswordAttempt from "../models/PasswordAttempt";
+import PropertyShowing from "../models/PropertyShowing";
 
 
 const dbHost = process.env.DB_HOST || '';
@@ -32,13 +34,14 @@ const sequelize = new Sequelize({
         User, Package, PromotedProperty,
         Property, PropertyCategory, PropertyGallery,
         PropertySpecification, SubscribedPackage,
-        Subscription, OTP, UserEntitlement, Advertisement
+        Subscription, OTP, UserEntitlement, Advertisement,
+        PasswordAttempt, PropertyShowing
     ]
 })
 
 // ✅ default scope is called automatically on User.find() etc
-User.addScope('defaultScope', {
-    attributes: { exclude: [ ...User.sensitiveProperties ] },
-});
+// User.addScope('defaultScope', {
+//     attributes: { exclude: [ ...User.sensitiveProperties ] },
+// });
 
 export default sequelize;

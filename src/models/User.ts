@@ -24,7 +24,7 @@ class User extends Model {
     firstName?: string;
 
     @Attribute(DataTypes.STRING)
-    declare role: string;
+    declare role: "guest" | "agent" | "admin";
 
     @Attribute(DataTypes.STRING)
     lastName?: string;
@@ -80,15 +80,15 @@ class User extends Model {
     static optionalForAssociations: string[] = [ ...User.sensitiveProperties, 'lastLoginAt', 'currentLoginAt', 'publicKey', 'loginId', 'currentLoginAt','createdAt', 'updatedAt', 'basicInfoUpdatedAt' ]
 
     // // Hide sensitive fields when serializing
-    // toJSON() {
-    //     const values = { ...this.get() };
-    //
-    //     for (const field of Array.isArray((this.constructor as typeof User).sensitiveProperties) ? (this.constructor as typeof User).sensitiveProperties : []) {
-    //         delete values[field];
-    //     }
-    //
-    //     return values;
-    // }
+    toJSON() {
+        const values = { ...this.get() };
+
+        for (const field of Array.isArray((this.constructor as typeof User).sensitiveProperties) ? (this.constructor as typeof User).sensitiveProperties : []) {
+            delete values[field];
+        }
+
+        return values;
+    }
 
 
 

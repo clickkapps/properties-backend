@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import User from "../models/User";
 import {calculateBillingPrice, createSubscription, verifyPayment} from "../traits/subscription.trait.";
 import moment from "moment";
-import https from "https";
+import {sendInvoice} from "../traits/notifications.trait";
 
 export const getBill = async(req: Request, res: Response, next: NextFunction) => {
 
@@ -27,11 +27,19 @@ export const getBill = async(req: Request, res: Response, next: NextFunction) =>
 export const postProcessSubscription = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const { startDate, endDate, packageSlug, propertyId } = req.body;
+        const { startDate, endDate, packageSlug, propertyId, useInvoice, userId } = req.body;
 
-        const user = req.user as User
+        let user = req.user as User
+        if(userId) {
+            const userForSubscription = await User.findByPk(userId)
+            if (userForSubscription) {
+                user = userForSubscription
+            }
+        }
+
         let actualStartDate: string
         let actualEndDate: string
+        let sendInvoice = useInvoice || false
         const payload: Record<string, any> = {
             userId: user.id,
         }
@@ -69,6 +77,13 @@ export const postProcessSubscription = async (req: Request, res: Response, next:
             actualEndDate = endDate
 
         }
+        else if (packageSlug === "property_showing") {
+
+            actualStartDate = moment().toISOString()
+            actualEndDate = moment().add(70, 'years').toISOString()
+            sendInvoice =  useInvoice !== undefined ? useInvoice : true
+
+        }
         else {
             res.status(400).send({message: "Invalid service type"})
             return
@@ -81,13 +96,14 @@ export const postProcessSubscription = async (req: Request, res: Response, next:
         })
 
 
-        const subscription = await createSubscription(user, {
-            userId: user.id,
+        const subscription = await createSubscription({
+            user: user,
             packageSlug: packageSlug,
             subscriptionType: frequency,
             amountPayable:  amountToPay,
             currency: currency,
             payload: JSON.stringify(payload),
+            useInvoice: sendInvoice
         })
 
         res.status(200).json({ message: "subscription initiated successfully", data: subscription })
@@ -116,3 +132,23 @@ export const checkSubscriptionStatus = async (req: Request, res: Response, next:
         next(error)
     }
 }
+
+export const resendSubscriptionReminder = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const { subscriptionId, userId } = req.body
+
+        if(!subscriptionId || !userId) {
+            res.status(400).json({ error: 'Invalid request' })
+            return
+        }
+
+        await sendInvoice({ subscriptionId, userId})
+
+    }catch (error) {
+        next(error)
+    }
+
+}
+

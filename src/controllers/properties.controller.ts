@@ -15,6 +15,7 @@ import {
 import {defineAbilitiesFor} from "../helpers/defineAbility";
 import {permissionActions, permissionSubjects} from "../helpers/constants";
 import PromotedProperty from "../models/PromotedProperty";
+import {Op} from "sequelize";
 
 
 
@@ -188,7 +189,14 @@ export const updateProperty = async(req: Request, res: Response, next: NextFunct
 
         // add to the specification, it's safe to add up because deletion is handled on a different route
         if(specifications) {
-            await addPropertySpecifications(property.id, JSON.parse(specifications))
+            const specs: { id: number, title: string, value: string }[] = JSON.parse(specifications)
+            // const specsIds = specs.map((s) => s.id)
+            await PropertySpecification.destroy({
+                where: {
+                    propertyId: property.id,
+                }
+            })
+            await addPropertySpecifications(property.id, specs)
         }
 
         apiResponse = { message: "success", data: await getPropertyById(property.id) };

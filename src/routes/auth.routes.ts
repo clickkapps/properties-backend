@@ -3,7 +3,7 @@ import passport from "passport";
 import {
     getAuthenticationCompleted,
     getGoogleAuthentication,
-    getGoogleCallback, requestPhoneAuthentication, verifyPhoneAuthentication
+    getGoogleCallback, postPasswordAuthentication, requestPhoneAuthentication, verifyPhoneAuthentication
 } from "../controllers/auth.controller";
 import {useGoogleStrategy} from "../middlewares/auth.middleware";
 
@@ -24,10 +24,7 @@ router.get("/success", getAuthenticationCompleted);
 router.post('/phone', requestPhoneAuthentication)
 router.post('/phone/verify', verifyPhoneAuthentication)
 
-
-
-
-
+router.post('/password', postPasswordAuthentication)
 
 
 

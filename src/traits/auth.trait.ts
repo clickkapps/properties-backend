@@ -3,29 +3,12 @@ import {generateKey, hashPassword} from "../helpers/utils";
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import User from "../models/User";
+import {autoCreateUser} from "./user.trait";
 
 export const generateAccessTokenFromLoginId = async (args: CreateUserParams) => {
 
     // create user if it doesn't exist
-
-    const publicKey = generateKey()
-    const secreteKey = generateKey()
-    // const hashedPassword = await hashPassword(args.password || secreteKey);
-    const [user, created] = await User.findOrCreate({
-        where: {
-            loginId: args.loginId,
-        },
-        defaults: {
-            role: args.role,
-            firstName: args.firstName,
-            lastName: args.lastName,
-            photo: args.photo,
-            publicKey: publicKey,
-            secreteKey: secreteKey,
-            contactEmail: args.loginIdType == 'email' ? args.loginId : undefined,
-            contactPhone: args.loginIdType == 'phone' ? args.loginId : undefined,
-        }
-    })
+    const user = await  autoCreateUser(args)
 
     await user.update({
         currentLoginAt: moment(),

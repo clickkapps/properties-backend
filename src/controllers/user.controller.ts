@@ -4,9 +4,16 @@ import {ApiResponse} from "../types/shared.types";
 import moment from "moment";
 import UserEntitlement from "../models/UserEntitlement";
 import Subscription from "../models/Subscription";
+import {autoCreateUser} from "../traits/user.trait";
 
 export const getBasicInfo = async (req: Request, res: Response) => {
-    const userId = (req.user as User).id
+
+    const { uid } = req.query // pass uid as query param if you want to update a different user
+    const creator = (req.user as User)
+    let userId = creator.id
+    if(uid) {
+        userId = +uid
+    }
     const user = await User.findByPk(userId, {
         include: [{
             association: 'activeEntitlement',
@@ -27,8 +34,16 @@ export const updateBasicInfo = async (req: Request, res: Response, next: NextFun
 
     try {
 
-        const user = (req.user as User)
-        const userId = user.id
+        const creator = (req.user as User)
+        const { uid } = req.query // pass uid as query param if you want to update a different user
+        let user = creator
+        if(uid) {
+            const userToUpdate = await User.findByPk(uid)
+            if(userToUpdate) {
+                user = userToUpdate
+            }
+        }
+
         const updated = await User.update({
             firstName: req.body.firstName || user.firstName,
             lastName: req.body.lastName || user.lastName,
@@ -41,7 +56,7 @@ export const updateBasicInfo = async (req: Request, res: Response, next: NextFun
             role: req.body.role || user.role || 'agent',
         }, {
             where: {
-                id: userId
+                id: user.id
             }
         })
         console.log("updated", updated)
@@ -100,4 +115,38 @@ export const updateUserEntitlement = async (req: Request, res: Response, next: N
     }catch(err){
         next(err)
     }
+}
+
+// as it stands now, only admin can create another user
+export const postAutoCreateUser = async (req: Request, res: Response, next: NextFunction) => {
+
+    const { userFirstName, userLastName, contactPhone, contactEmail, role } = req.body;
+
+    const creator = (req.user as User)
+    if (!creator) {
+        res.status(400).json({message: "Invalid request"})
+        return
+    }
+
+    if(creator.role !== "admin"){
+        res.status(400).json({message: "Invalid request"})
+        return
+    }
+
+    if(!contactPhone || !userFirstName){
+        res.status(400).send({ message: "Invalid request"})
+        return
+    }
+
+    const user = await autoCreateUser({
+        loginId: contactPhone,
+        firstName: userFirstName,
+        lastName: userLastName,
+        loginIdType: "phone",
+        contactEmail: contactEmail,
+        role: role,
+    })
+
+    res.status(200).send({ data: user })
+
 }

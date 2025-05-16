@@ -1,11 +1,13 @@
-export interface CreateSubscriptionPayload {
+import User from "../models/User";
 
-    userId: number,
-    packageSlug: "properties_promotion" | "advertisement" | "basic_package" | "standard_package",
-    subscriptionType?: string,
+export interface CreateSubscriptionPayload {
+    user: User
+    packageSlug: "properties_promotion" | "advertisement" | "basic_package" | "standard_package" | "property_showing",
+    subscriptionType?: "one_time" | "daily",
     amountPayable?: number,
     currency?: string
-    payload?: string
+    payload?: string,
+    useInvoice?: boolean
 }
 
 export type UpdateSubscriptionPayload = {

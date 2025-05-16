@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <style>
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+        body {
+            background-color: #F3F4F6;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="p-8">
+<div class="max-w-xl mx-auto bg-white rounded-lg p-6">
+    <!-- Greeting -->
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ messageGreetings }}!</h2>
+    <p class="text-gray-600 mb-4">{{ messageContent }}. Please find your invoice details below:</p>
+
+    <!-- Invoice Details -->
+    <div class="bg-gray-50 p-4 rounded-md mb-4">
+        <p class="text-gray-800">Invoice Number: <strong>{{ invoiceNumber }}</strong></p>
+        <p class="text-gray-800">Amount Due: <strong>{{ amount }}</strong></p>
+        <p class="text-gray-800">Description: <strong>{{ description }}</strong></p>
+    </div>
+
+    <!-- Payment Button -->
+    <div class="text-center mb-4">
+        <a href="{{ invoicePaymentLink }}" style="text-decoration: none;">
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Make Payment
+            </button>
+        </a>
+    </div>
+
+    <!-- Alternative Link -->
+    <p class="text-gray-500 text-sm text-center mb-4">
+        If the button above does not work, please click on the link below:<br>
+        <a href="{{ invoicePaymentLink }}" class="text-blue-500 hover:underline">{{ invoicePaymentLink }}</a>
+    </p>
+
+    <!-- Subscription Message -->
+    <div class="bg-gray-100 p-4 rounded-md text-center">
+        <p class="text-gray-600">To manage your subscriptions and view past invoices, please visit your account page.</p>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-xs text-gray-400 mt-4 text-center">
+        You are receiving this email because you are subscribed to our service. If you have any questions, please contact
+        {{adminContactPhone}}.
+    </p>
+</div>
+</body>
+</html>

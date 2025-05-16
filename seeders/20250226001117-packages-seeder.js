@@ -49,6 +49,17 @@ module.exports = {
             currency: "GHS",
             createdAt: moment().toDate(),
             updatedAt: moment().toDate()
+        },
+        {
+            slug: "property_showing",
+            name: "Property Showing",
+            group: "property_showing",
+            frequency: "one_time",
+            description: "Package for property showing",
+            price: 70,
+            currency: "GHS",
+            createdAt: moment().toDate(),
+            updatedAt: moment().toDate()
         }
 
     ])
@@ -70,6 +81,10 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    return queryInterface.bulkDelete('Packages', null, {} )
+    return queryInterface.bulkDelete('Packages', {
+        // where: {}
+    }, {
+
+    } )
   }
 };

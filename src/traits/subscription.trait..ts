@@ -6,7 +6,7 @@ import Package from "../models/Package";
 import {generateKey} from "../helpers/utils";
 import https from "https";
 import axios from 'axios'
-import subscription from "../models/Subscription";
+import {sendInvoice} from "./notifications.trait";
 
 type BillingPriceParams = {
     packageSlug: "properties_promotion" | "advertisement" | "basic_package" | "standard_package";
@@ -109,28 +109,51 @@ export const calculateBillingPrice = async (args: BillingPriceParams): Promise<{
         }
     }
 
+    if (args.packageSlug === "property_showing") {
+
+        const pkg = await Package.findOne({
+            where: {
+                group: "property_showing",
+                slug: "property_showing",
+            }
+        })
+
+        if(!pkg || !pkg?.price || !pkg.frequency) {
+            //  not expected to happen
+            throw new Error("Invalid package selected");
+        }
+
+        return {
+            amountToPay: pkg.price,
+            frequency: pkg.frequency,
+            currency: pkg.currency
+        }
+
+    }
+
 
     throw new Error("Invalid service type");
 
 }
 
 
-export const createSubscription = async (user: User, args: CreateSubscriptionPayload, sendInvoice: boolean = true) => {
+export const createSubscription = async (args: CreateSubscriptionPayload) => {
 
     const serverId = generateKey()
     // create subscription
     const subscription = await Subscription.create({
         ...args,
-        userId: args.userId,
+        userId: args.user.id,
         serviceType: args.packageSlug,
         status: 'pending',
         serverId: serverId,
     },)
 
-    // if(sendInvoice) {
-    //     // send invoice to user
-    //     const user = User.findByPk(payload.userId)
-    // }
+    if(args.useInvoice) {
+        // send invoice to user
+        // const user = User.findByPk(args.userId)
+        sendInvoice({ userId: args.user.id, subscriptionId: subscription.id}).then()
+    }
 
     // const checkoutPayload = await generatePaymentCheckout(user, subscription)
     // const existingSubPld = subscription.payload ? JSON.parse(subscription.payload) : { }
@@ -145,15 +168,15 @@ export const createSubscription = async (user: User, args: CreateSubscriptionPay
     // })
 
     return {
+        subscriptionId: subscription.id,
         reference: subscription.serverId,
         amount: (subscription.amountPayable || 0) * 100,
-        email: user.contactEmail || process.env.AMIN_DEFAULT_EMAIL,
+        email: args.user.contactEmail || process.env.AMIN_DEFAULT_EMAIL,
         pk: process.env.PAYMENT_PUBLIC_KEY,
         currency: subscription.currency
     }
 
 }
-
 
 export const verifyPayment = async (reference: string) => {
 

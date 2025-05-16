@@ -14,6 +14,8 @@ import subscriptionRoutes from "./routes/subscription.routes";
 import {logIncomingRequests} from "./middlewares/monitor.middleware";
 import cors, {CorsOptions} from "cors";
 import adRoutes from "./routes/ad.routes";
+import throttleMiddleware from "./middlewares/throttle.middleware";
+import showingsRoutes from "./routes/showings.routes";
 
 const app = express()
 app.use(bodyParser.json())
@@ -49,12 +51,16 @@ app.use(cors(corsOptions))
 
 app.use(logIncomingRequests)
 
+// Apply the rate limiter middleware to API routes only
+app.use('/api/', throttleMiddleware);
+
 app.use('/api/auth', authRoutes)
 app.use('/api/users', isAuthenticated, userRoutes)
 app.use('/api/packages', packageRoutes)
 app.use('/api/properties', propertyRoutes )
 app.use('/api/subscription', subscriptionRoutes )
 app.use('/api/advertisements', adRoutes )
+app.use('/api/showings', showingsRoutes )
 
 app.get('api/', (req, res, next) => {
     res.status(200).json({ message: 'Service is running now!'})

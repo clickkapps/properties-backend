@@ -5,14 +5,15 @@ import User from "../models/Ueser";
 // type ApiResponse = User | Error;
 
 export interface CreateUserParams {
-    role?: 'agent' | 'admin';
+    role?: 'agent' | 'admin' | "guest";
     loginId: string;
     loginIdType?: 'phone' | 'email';
     firstName?: string;
     lastName?: string;
     photo?: string;
-    password?: string;
-    publicKey?: string;
+    password?: string,
+    contactEmail?: string
+    contactPhone?: string
 }
 
 export interface TokenPayload {

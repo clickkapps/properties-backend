@@ -48,7 +48,14 @@ class Subscription extends Model {
     @Attribute(DataTypes.STRING)
     declare payload?: string
 
+    @Attribute(DataTypes.STRING)
+    declare invoiceId?: string
 
+    @Attribute(DataTypes.DATE)
+    declare lastInvoiceSentAt?: Date
+
+    @Attribute(DataTypes.INTEGER)
+    declare invoiceNotificationsCount?: number;
 
 }
 

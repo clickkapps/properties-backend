@@ -6,6 +6,10 @@ import OTP from "../models/OTP";
 import {Op} from "sequelize";
 import moment from "moment";
 import { generateAccessTokenFromLoginId } from "../traits/auth.trait";
+import User from "../models/User";
+import PasswordAttempt from "../models/PasswordAttempt";
+import passwordAttempt from "../models/PasswordAttempt";
+import {autoCreateUser} from "../traits/user.trait";
 
 export const getGoogleAuthentication =  passport.authenticate('google', { scope: [ 'email', 'profile' ] })
 export const getGoogleCallback = passport.authenticate( 'google', {
@@ -158,6 +162,97 @@ export const verifyPhoneAuthentication = async (req: Request, res: Response, nex
 
     }catch (error) {
         next(error)
+    }
+
+}
+
+
+export const postPasswordAuthentication = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const { loginId, password } = req.body;
+        const { role } =  req.query
+        console.log("request: ", loginId )
+
+        if (!loginId || !password) {
+            res.status(400).send({ message: 'Invalid request '})
+            return;
+        }
+
+        const userRole = role as string || "admin";
+
+        const user = await User.findOne({
+            where: {
+                loginId: loginId
+            }
+        })
+
+        if (!user) {
+            res.status(403).send({ message: 'Invalid request '})
+            return;
+        }
+
+        // if password is not set
+        if (!user.password) {
+            res.status(403).send({ message: 'Invalid request '})
+            return;
+        }
+
+        if(user.role !== userRole) {
+            res.status(403).send({ message: 'Invalid request '})
+            return;
+        }
+
+        const previousAttempt = await PasswordAttempt.findOne({
+            where: {
+                userId: user.id
+            }
+        })
+
+        // user cannot login again if numer of attempts exceed 3
+        if (previousAttempt) {
+
+            if(previousAttempt.attempts >= 3) {
+                res.status(403).send({ message: 'Number of password attempts exceeded'})
+                return;
+            }
+
+        }
+
+        const isValid = await comparePassword(password, user.password)
+
+        const [ attempted, _ ] = await PasswordAttempt.findOrCreate({
+            where: { userId: user.id },
+            defaults: {
+                attempts: 0,
+            },
+        })
+
+        if(!isValid) {
+
+            await attempted.update({
+                attempts: attempted.attempts + 1,
+            })
+
+            const attemptsRemaining = 4 - (attempted.attempts === 0 ? 1 : attempted.attempts)
+            res.status(403).send({ message: `Invalid credentials. ${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining` })
+            return
+
+        }
+
+        await attempted.update({ attempts: 0 })
+
+        const tokenPayload = await generateAccessTokenFromLoginId({
+            loginId: loginId,
+            loginIdType: 'email'
+        })
+
+        res.status(200).send({ data: tokenPayload.token })
+
+
+    }catch(err) {
+        next(err)
     }
 
 }
