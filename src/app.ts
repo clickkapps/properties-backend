@@ -26,7 +26,7 @@ import Redis from 'ioredis';
 const apiVersion = '1.0.0'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
-console.log("healthLog", {
+console.log("configs", {
     environment: process.env['NODE_ENV'],
     version: apiVersion
 })
@@ -114,11 +114,11 @@ app.use('/', get404)
 // database connection
 db.authenticate()
 .then(() => {
-    console.log("databaseLog: Connection to the database has been established successfully.");
+    console.log("databaseLog","Connection to the database has been established successfully.");
     // return User.create({ })
 })
 .catch((err: any) => {
-    console.log("databaseLog: database connection error:", err.message);
+    console.log("databaseLog","Connection error:", err.message);
 });
 
 // console.log("inserted result - ", result);

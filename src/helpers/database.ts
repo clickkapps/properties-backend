@@ -15,13 +15,16 @@ import Advertisement from "../models/Advertisement";
 import PasswordAttempt from "../models/PasswordAttempt";
 import PropertyShowing from "../models/PropertyShowing";
 
-const isProduction = process.env.NODE_ENV === 'production';
+const inProductionMode = process.env.NODE_ENV === 'production';
 
 const dbHost = process.env.DB_HOST || '';
 const dbName = process.env.DB_NAME || '';
 const dbUsername = process.env.DB_USERNAME || '';
 const dbPassword = process.env.DB_PASSWORD || '';
 const dbPort = process.env.DB_PORT;
+
+const sslPath = process.env.DB_CERT_PATH
+console.log("customLog", sslPath)
 
 const sequelize = new Sequelize({
     dialect: PostgresDialect,
@@ -31,7 +34,10 @@ const sequelize = new Sequelize({
     host: dbHost,
     port: parseInt(dbPort || '5432', 10),
     logging: console.log, // Enable SQL query logging
-    ssl: isProduction,
+    ssl: inProductionMode ? {
+        rejectUnauthorized: true,
+        ca: sslPath
+    } : false,
     models: [
         User, Package, PromotedProperty,
         Property, PropertyCategory, PropertyGallery,
