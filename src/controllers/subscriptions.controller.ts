@@ -3,6 +3,7 @@ import User from "../models/User";
 import {calculateBillingPrice, createSubscription, verifyPayment} from "../traits/subscription.trait.";
 import moment from "moment";
 import {sendInvoice} from "../traits/notifications.trait";
+import Subscription from "../models/Subscription";
 
 export const getBill = async(req: Request, res: Response, next: NextFunction) => {
 
@@ -150,5 +151,43 @@ export const resendSubscriptionReminder = async (req: Request, res: Response, ne
         next(error)
     }
 
+}
+
+export const updateSubscriptionStatus = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const { id } = req.params
+        const { status } = req.body
+
+        const creator = (req.user as User)
+        if (!creator) {
+            res.status(400).send({ message: "Invalid request"})
+            return
+        }
+        if(creator.role !== "admin"){
+            res.status(400).send({ message: "Invalid request"})
+            return
+        }
+
+        if(!["success", "failed", "pending"].includes(status)){
+            res.status(400).send({ message: "Invalid request"})
+            return
+        }
+
+        const subscription = await Subscription.findByPk(id)
+        if(!subscription){
+            res.status(400).send({ message: "Invalid request"})
+            return
+        }
+
+        await subscription.update({
+            status: status,
+        })
+
+        res.status(200).send({ message: "updated! "})
+
+    }catch (error) {
+        next(error)
+    }
 }
 

@@ -15,11 +15,13 @@ import Advertisement from "../models/Advertisement";
 import PasswordAttempt from "../models/PasswordAttempt";
 import PropertyShowing from "../models/PropertyShowing";
 
+const isProduction = process.env.NODE_ENV === 'production';
 
 const dbHost = process.env.DB_HOST || '';
 const dbName = process.env.DB_NAME || '';
 const dbUsername = process.env.DB_USERNAME || '';
 const dbPassword = process.env.DB_PASSWORD || '';
+const dbPort = process.env.DB_PORT;
 
 const sequelize = new Sequelize({
     dialect: PostgresDialect,
@@ -27,9 +29,9 @@ const sequelize = new Sequelize({
     user: dbUsername,
     password: dbPassword,
     host: dbHost,
-
-//     ssl: true,
-//   clientMinMessages: 'notice',
+    port: parseInt(dbPort || '5432', 10),
+    logging: console.log, // Enable SQL query logging
+    ssl: isProduction,
     models: [
         User, Package, PromotedProperty,
         Property, PropertyCategory, PropertyGallery,
@@ -43,5 +45,9 @@ const sequelize = new Sequelize({
 // User.addScope('defaultScope', {
 //     attributes: { exclude: [ ...User.sensitiveProperties ] },
 // });
+
+User.addScope('excludeSensitive', {
+    attributes: { exclude: User.sensitiveProperties },
+});
 
 export default sequelize;

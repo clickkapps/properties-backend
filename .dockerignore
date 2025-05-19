@@ -12,11 +12,16 @@ coverage/**
 
 # Environment files
 .env
+.env.production
 .env.*
-redis_data
+
 
 # Dependency directories
 node_modules
+package-lock.json
+migrations
+config
+redis_data
 
 # MacOS related files
 *.DS_Store

@@ -72,7 +72,10 @@ export const getShowingDetails = async (req: Request, res: Response, next: NextF
 const getPropertyShowingById = async (id: number): Promise<PropertyShowing | null> => {
     return await PropertyShowing.findByPk(id, {
         include: [
-            User,
+            {
+                model: User,
+                attributes: { exclude: [...User.sensitiveProperties, ...User.optionalForAssociations] }, // Exclude sensitive fields
+            },
             Subscription,
             Property
         ]
@@ -119,7 +122,10 @@ export const getPropertyShowings = async (req: Request, res: Response, next: Nex
         const showings = await PropertyShowing.findAll({
             where: where,
             include: [
-                User,
+                {
+                    model: User,
+                    attributes: { exclude: [...User.sensitiveProperties, ...User.optionalForAssociations] }, // Exclude sensitive fields
+                },
                 Subscription,
                 Property
             ],

@@ -35,7 +35,7 @@ export const sendInvoice = async (args: SendInvoiceParams) => {
     });
 
     const invoicePaymentLink = `${process.env.WEB_APP_URL}/public/invoice/${invoiceId}`;
-    const adminContactPhone = process.env.AMIN_CONTACT_PHONE;
+    const adminContactPhone = process.env.ADMIN_CONTACT_PHONE;
 
     const messageGreetings = `Good day ${user.firstName} ${user.lastName}`
     const messageContent = `An invoice has been generated for you.`
