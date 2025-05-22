@@ -4,17 +4,23 @@ import {
         createPropertyCategory,
         deleteOtherImage,
         deletePropertySpecification,
-        getPropertiesNoAuthorization,
-        getPropertiesWithAuthorization,
+        getNoAuthorizationProperties,
+        getAuthorizedProperties,
         getPropertyCategories,
-        getPropertyDetail, postPromoteProperty, publishProperty,
+        getPropertyDetail,
+        postPromoteProperty,
+        publishProperty,
 
         removeProperty,
         removePropertyCategory,
         removePropertyGallery,
-        removePropertySpecification, unPublishProperty,
+        removePropertySpecification,
+        unPublishProperty,
         updateProperty,
-        updatePropertyCategory
+        updatePropertyCategory,
+        getRelatedNoAuthorizationProperties,
+        getPromotedNoAuthorizationProperties,
+        getFeaturedNoAuthorizationProperties, countAuthorizedProperties
 } from "../controllers/properties.controller";
 import {reqFile} from "../helpers/utils";
 import {isAuthenticated, isAuthorized} from "../middlewares/auth.middleware";
@@ -46,8 +52,15 @@ router.use('/categories', categoriesRouter);
 router.use('/specifications', specificationsRouter);
 router.use('/gallery', galleryRouter);
 
-router.get("/", isAuthenticated, getPropertiesWithAuthorization)
-router.get("/public", getPropertiesNoAuthorization)
+router.get("/", isAuthenticated, getAuthorizedProperties)
+router.get("/count", isAuthenticated, countAuthorizedProperties)
+
+// for website
+router.get("/public/filtered", getNoAuthorizationProperties)
+router.get("/public/related/{propertyId}", getRelatedNoAuthorizationProperties)
+router.get("/public/promoted", getPromotedNoAuthorizationProperties)
+router.get("/public/featured", getFeaturedNoAuthorizationProperties)
+
 router.post("/", isAuthenticated, isAuthorized(permissionActions.create, permissionSubjects.properties), reqFile.fields([
         { name: 'mainImage', maxCount: 1 },
         { name: 'otherImages', maxCount: 10 }

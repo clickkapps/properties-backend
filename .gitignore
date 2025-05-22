@@ -19,6 +19,7 @@ redis_data
 node_modules
 certs_547
 
+
 # MacOS related files
 *.DS_Store
 .AppleDouble

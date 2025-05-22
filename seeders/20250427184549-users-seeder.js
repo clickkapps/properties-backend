@@ -31,8 +31,8 @@ module.exports = {
       {
         firstName: 'Developer',
         lastName: 'Admin',
-        loginId: process.env.ADMIN_DEFAULT_EMAIL,
-        contactEmail: process.env.ADMIN_DEFAULT_EMAIL,
+        loginId: process.env.DEV_DEFAULT_EMAIL,
+        contactEmail: process.env.DEV_DEFAULT_EMAIL,
         contactPhone: process.env.ADMIN_CONTACT_PHONE,
         requiresPasswordUpdate: false,
         basicInfoUpdatedAt: new Date(),

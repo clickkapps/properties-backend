@@ -23,7 +23,7 @@ import path from "path";
 import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 
-const apiVersion = '1.0.0'
+const apiVersion = '1.0.2'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -35,17 +35,25 @@ const inProductionMode = process.env['NODE_ENV'] === 'production'
 const app = express()
 app.use(bodyParser.json())
 
-const redisClient = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    password: process.env.REDIS_PASSWORD || undefined,
-});
+// locally start redis container with
+// docker run -p 6379:6379 -d --name redis-container redis
+
+let redisStore: RedisStore | undefined
+
+if(inProductionMode) {
+
+    const redisClient = new Redis({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        password: process.env.REDIS_PASSWORD || undefined,
+    });
 
 // Initialize store.
-let redisStore = new RedisStore({
-    client: redisClient,
-    prefix: "ppark:",
-})
+    redisStore = new RedisStore({
+        client: redisClient,
+        prefix: "ppark:",
+    })
+}
 
 const sessionConfig = {
     store: redisStore,
@@ -65,7 +73,9 @@ if (inProductionMode) {
 
 app.use(session(sessionConfig))
 
-let whitelist = inProductionMode ? ["http://99.192.8.22:5173"] : ['http://localhost:5173']
+const webAppUrl = process.env.WEB_APP_URL || '';
+// add any other client developer's IP to it
+let whitelist = inProductionMode ? ["http://99.192.8.22:5173", webAppUrl, 'http://localhost:5173'] : ['http://localhost:5173']
 
 const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
@@ -88,9 +98,11 @@ app.use(function(req,res,next){
 });
 
 app.use(logIncomingRequests)
-app.use('/', (req, res) => {
+
+app.get('/', (req, res) => {
     res.json({ message: `API VERSION ${apiVersion}` })
 })
+
 // Apply the rate limiter middleware to API routes only
 app.use('/api', throttleMiddleware);
 app.use('/api/auth', authRoutes)
@@ -100,7 +112,6 @@ app.use('/api/properties', propertyRoutes )
 app.use('/api/subscription', subscriptionRoutes )
 app.use('/api/advertisements', adRoutes )
 app.use('/api/showings', isAuthenticated, showingsRoutes )
-
 
 
 app.get('/500', get500)

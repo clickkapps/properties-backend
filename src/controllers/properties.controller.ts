@@ -10,7 +10,7 @@ import PropertyCategory from "../models/PropertyCategory";
 import {
     addPropertyGallery,
     addPropertySpecifications,
-    getPropertyById
+    getPropertyById, setAccessibleImages
 } from "../traits/properties.trait";
 import {defineAbilitiesFor} from "../helpers/defineAbility";
 import {permissionActions, permissionSubjects} from "../helpers/constants";
@@ -356,7 +356,10 @@ const propertiesWithAuthorizationWhereQueryBuilder = (req: Request) => {
 
     const where: any = {}
     if(userId) {
-        where.userId = userId
+        where.userId = Number(userId)
+    }
+    if(published) {
+        where.published = published === "true"
     }
 
     const ability = defineAbilitiesFor(user);
@@ -370,7 +373,7 @@ const propertiesWithAuthorizationWhereQueryBuilder = (req: Request) => {
 }
 
 // count published or unpublished properties
-export const countProperties = async(req: Request, res: Response, next: NextFunction) => {
+export const countAuthorizedProperties = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
 
@@ -382,7 +385,6 @@ export const countProperties = async(req: Request, res: Response, next: NextFunc
 
         const apiResponse: ApiResponse = {
             data: {count},
-            message: "success"
         }
 
         res.status(200).send(apiResponse);
@@ -392,7 +394,7 @@ export const countProperties = async(req: Request, res: Response, next: NextFunc
     }
 }
 
-export const getPropertiesWithAuthorization = async(req: Request, res: Response, next: NextFunction) => {
+export const getAuthorizedProperties = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
 
@@ -403,24 +405,9 @@ export const getPropertiesWithAuthorization = async(req: Request, res: Response,
             order: [['createdAt', 'DESC']],
         });
 
-        const transformed = properties.map((property) => {
-            if(property.mainImagePath) {
-                const split = property.mainImagePath.split("/")
-                // const folder = split[0]
-                property.mainImagePath = split[1]
-            }
-            // if(property.gallery && property.gallery.length > 0) {
-            //     property.gallery.map((g) => {
-            //         if(g?.path) {
-            //             g.path = g.path.split("/")[1]
-            //         }
-            //         return g
-            //     })
-            // }
-            return property
-        })
+        const transformed = setAccessibleImages(properties)
 
-        const apiResponse: ApiResponse = { message: "success", data: transformed };
+        const apiResponse: ApiResponse = { data: transformed };
         res.status(200).json(apiResponse)
 
     }catch (error) {
@@ -428,14 +415,97 @@ export const getPropertiesWithAuthorization = async(req: Request, res: Response,
     }
 }
 
-export const getPropertiesNoAuthorization = async(req: Request, res: Response, next: NextFunction) => {
+// This is where you apply the filters
+export const getNoAuthorizationProperties = async(req: Request, res: Response, next: NextFunction) => {
+
     const properties = await Property.findAll( {
         where: {
             published: true
         },
         order: [['createdAt', 'DESC']],
     });
-    res.status(200).json({ message: "success", data: properties })
+
+    const transformed = setAccessibleImages(properties)
+
+    res.status(200).json({ data: transformed })
+}
+
+export const getRelatedNoAuthorizationProperties = async(req: Request, res: Response, next: NextFunction) => {
+
+    const { propertyId } = req.params
+
+    const property = await Property.findByPk(propertyId)
+    if(!property) {
+        res.status(400).send({message: "Invalid request"})
+        return
+    }
+
+    const propertyCategory = await PropertyCategory.findByPk(property.categoryId)
+    let properties = await Property.findAll( {
+        where: {
+            published:true,
+            categoryId: propertyCategory?.id,
+            id: {
+                [Op.not]: property?.id,
+            }
+        },
+        order: [['createdAt', 'DESC']],
+    });
+
+    if (properties.length == 0) {
+        properties = await Property.findAll( {
+            limit: 10,
+            order: [['createdAt', 'DESC']],
+        })
+    }
+
+    const transformed = setAccessibleImages(properties)
+    res.status(200).json({ data: transformed })
+
+}
+
+export const getPromotedNoAuthorizationProperties = async(req: Request, res: Response, next: NextFunction) => {
+
+    let properties = await Property.findAll( {
+        where: {
+            published:true,
+            promoted: true,
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 10
+    });
+
+    if(properties.length === 0) {
+        properties = await Property.findAll( {
+            limit: 10,
+            order: [['createdAt', 'DESC']],
+        })
+    }
+
+    const transformed = setAccessibleImages(properties)
+    res.status(200).json({ data: transformed })
+}
+
+export const getFeaturedNoAuthorizationProperties = async(req: Request, res: Response, next: NextFunction) => {
+
+    let properties = await Property.findAll( {
+        where: {
+            published:true,
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 10
+    })
+
+    if(properties.length === 0) {
+        properties = await Property.findAll( {
+            limit: 10,
+            order: [['createdAt', 'DESC']],
+        })
+    }
+
+    const transformed = setAccessibleImages(properties)
+    res.status(200).json({ data: transformed })
+
 }
 
 export const removePropertySpecification = async(req: Request, res: Response, next: NextFunction) => {

@@ -57,3 +57,22 @@ export const addPropertySpecifications = async (propertyId: number, specificatio
 
     await PropertySpecification.bulkCreate(specificationsToInsert);
 }
+
+export const setAccessibleImages =  (properties: Property[]) => {
+    return properties.map((property) => {
+        if(property.mainImagePath) {
+            const split = property.mainImagePath.split("/")
+            // const folder = split[0]
+            property.mainImagePath = split[1]
+        }
+        // if(property.gallery && property.gallery.length > 0) {
+        //     property.gallery.map((g) => {
+        //         if(g?.path) {
+        //             g.path = g.path.split("/")[1]
+        //         }
+        //         return g
+        //     })
+        // }
+        return property
+    })
+}
