@@ -6,6 +6,7 @@ import {
 import {Table, Attribute, PrimaryKey, AutoIncrement, HasMany, HasOne} from '@sequelize/core/decorators-legacy';
 import PropertySpecification from "./PropertySpecification";
 import UserEntitlement from "./UserEntitlement";
+import Permission from "./Permission";
 
 @Table
 class User extends Model {
@@ -67,6 +68,9 @@ class User extends Model {
 
     @HasMany(() => UserEntitlement, 'userId')
     declare entitlementHistory?: NonAttribute<UserEntitlement[]>;
+
+    @HasMany(() => Permission, 'userId')
+    declare permissions?: NonAttribute<Permission[]>;
 
     @HasOne(() => UserEntitlement, {
         foreignKey: 'userId',

@@ -19,6 +19,9 @@ class Permission extends Model {
     declare user?: NonAttribute<User>;
 
     @Attribute(DataTypes.STRING)
+    declare verb?: string
+
+    @Attribute(DataTypes.STRING)
     declare action?: string
 
     @Attribute(DataTypes.STRING)

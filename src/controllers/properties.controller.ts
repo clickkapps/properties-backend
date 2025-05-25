@@ -10,13 +10,13 @@ import PropertyCategory from "../models/PropertyCategory";
 import {
     addPropertyGallery,
     addPropertySpecifications,
-    getPropertyById, setAccessibleImages
+    getPropertyById,
+    setAccessibleImages
 } from "../traits/properties.trait";
 import {defineAbilitiesFor} from "../helpers/defineAbility";
 import {permissionActions, permissionSubjects} from "../helpers/constants";
 import PromotedProperty from "../models/PromotedProperty";
 import {Op} from "sequelize";
-
 
 
 //  Property section
@@ -664,8 +664,16 @@ export const updatePropertyCategory = async (req: Request, res: Response, next: 
 export const postPromoteProperty = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const { propertyId, subscriptionId } = req.body;
-        const user = req.user as User;
+        const { propertyId, subscriptionId, userId } = req.body;
+        let user: User|null = req.user as User
+        if(userId) {
+            user = await User.findByPk(userId)
+            if(!user) {
+                console.log("User not found")
+                res.status(400).send({message: "invalid request"})
+                return
+            }
+        }
 
         if(!propertyId || !subscriptionId){
             res.status(400).send({message: "invalid request"})

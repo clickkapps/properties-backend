@@ -57,7 +57,7 @@ router.get("/count", isAuthenticated, countAuthorizedProperties)
 
 // for website
 router.get("/public/filtered", getNoAuthorizationProperties)
-router.get("/public/related/{propertyId}", getRelatedNoAuthorizationProperties)
+router.get("/public/related/:propertyId", getRelatedNoAuthorizationProperties)
 router.get("/public/promoted", getPromotedNoAuthorizationProperties)
 router.get("/public/featured", getFeaturedNoAuthorizationProperties)
 

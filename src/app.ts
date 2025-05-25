@@ -104,7 +104,9 @@ app.get('/', (req, res) => {
 })
 
 // Apply the rate limiter middleware to API routes only
-app.use('/api', throttleMiddleware);
+if(inProductionMode) {
+    app.use('/api', throttleMiddleware);
+}
 app.use('/api/auth', authRoutes)
 app.use('/api/users', isAuthenticated, userRoutes)
 app.use('/api/packages', packageRoutes)

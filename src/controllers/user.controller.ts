@@ -5,6 +5,8 @@ import moment from "moment";
 import UserEntitlement from "../models/UserEntitlement";
 import Subscription from "../models/Subscription";
 import {autoCreateUser} from "../traits/user.trait";
+import Permission from "../models/Permission";
+import {defineAbilitiesFor} from "../helpers/defineAbility";
 
 export const getBasicInfo = async (req: Request, res: Response) => {
 
@@ -17,6 +19,8 @@ export const getBasicInfo = async (req: Request, res: Response) => {
     const user = await User.findByPk(userId, {
         include: [{
             association: 'activeEntitlement',
+        }, {
+            association: 'permissions',
         }]
     })
     let apiResponse: ApiResponse
@@ -26,7 +30,23 @@ export const getBasicInfo = async (req: Request, res: Response) => {
         return;
     }
 
-    apiResponse = { data: user  };
+    const ability = defineAbilitiesFor(user);
+    let rolePermissionId = 0
+    const rolePermissions = ability.rules.map((rule, index) => {
+        --rolePermissionId
+        return ({
+            id: rolePermissionId,
+            userId: user.id,
+            verb: rule.inverted ? 'cannot' : 'can',
+            action: rule.action,
+            subject: rule.subject
+        });
+    })
+
+    const userJson = user.toJSON()
+    userJson.permissions = [...userJson.permissions, ...rolePermissions]
+
+    apiResponse = { data: userJson  };
     res.status(200).json( apiResponse )
 }
 

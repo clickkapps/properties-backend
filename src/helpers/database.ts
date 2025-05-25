@@ -15,6 +15,7 @@ import Advertisement from "../models/Advertisement";
 import PasswordAttempt from "../models/PasswordAttempt";
 import PropertyShowing from "../models/PropertyShowing";
 import fs from 'fs';
+import Permission from "../models/Permission";
 
 const inProductionMode = process.env.NODE_ENV === 'production';
 
@@ -55,7 +56,7 @@ const sequelize = new Sequelize({
         Property, PropertyCategory, PropertyGallery,
         PropertySpecification, SubscribedPackage,
         Subscription, OTP, UserEntitlement, Advertisement,
-        PasswordAttempt, PropertyShowing
+        PasswordAttempt, PropertyShowing, Permission
     ]
 })
 
