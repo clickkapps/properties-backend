@@ -1,7 +1,7 @@
 'use strict';
 
-const {Op} = require("@sequelize/core");
 const bcrypt = require("bcrypt");
+const {Op} = require("@sequelize/core");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -14,34 +14,34 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    return queryInterface.bulkInsert('Users', [
+    await queryInterface.bulkInsert('Users', [
       {
-        firstName: 'Super',
-        lastName: 'Admin',
-        loginId: process.env.ADMIN_DEFAULT_EMAIL,
-        contactEmail: process.env.ADMIN_DEFAULT_EMAIL,
-        contactPhone: process.env.ADMIN_CONTACT_PHONE,
-        requiresPasswordUpdate: true,
-        basicInfoUpdatedAt: new Date(),
-        role: 'admin',
-        password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        firstName: 'Developer',
-        lastName: 'Admin',
-        loginId: process.env.DEV_DEFAULT_EMAIL,
-        contactEmail: process.env.DEV_DEFAULT_EMAIL,
-        contactPhone: process.env.ADMIN_CONTACT_PHONE,
+        firstName: 'System',
+        lastName: 'GhanaMLS',
+        loginId: 'system_983',
+        contactEmail: 'system@properties.com',
+        contactPhone: '0000000000',
         requiresPasswordUpdate: false,
         basicInfoUpdatedAt: new Date(),
-        role: 'admin',
+        role: 'system',
         password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    ], { })
+      {
+        firstName: 'Support',
+        lastName: 'GhanaMLS',
+        loginId: 'support_442',
+        contactEmail: 'support@ghanamls.org',
+        contactPhone: '0244556677',
+        requiresPasswordUpdate: false,
+        basicInfoUpdatedAt: new Date(),
+        role: 'support',
+        password: await bcrypt.hash(process.env.ADMIN_DEFAULT_PASSWORD, 10),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    ])
   },
 
   async down (queryInterface, Sequelize) {
@@ -51,11 +51,10 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-
     return queryInterface.bulkDelete('Users', {
       [Op.or]: [
-        { loginId: 'admin@properties.com' },
-        { loginId: 'dev@properties.com' },
+        { loginId: 'system_983' },
+        { loginId: 'support_442' },
       ]
     });
   }

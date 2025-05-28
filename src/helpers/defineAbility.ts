@@ -13,7 +13,7 @@ export function defineAbilitiesFor(user: User) {
     const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
     const role = user.role
 
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'system') {
         can(permissionActions.manage, permissionSubjects.all);
     } else if (role === 'agent') {
         can(permissionActions.create, permissionSubjects.properties);

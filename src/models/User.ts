@@ -25,7 +25,7 @@ class User extends Model {
     firstName?: string;
 
     @Attribute(DataTypes.STRING)
-    declare role: "guest" | "agent" | "admin";
+    declare role: "guest" | "agent" | "admin" | "system";
 
     @Attribute(DataTypes.STRING)
     lastName?: string;

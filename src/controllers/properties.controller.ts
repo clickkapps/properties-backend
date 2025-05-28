@@ -418,10 +418,85 @@ export const getAuthorizedProperties = async(req: Request, res: Response, next: 
 // This is where you apply the filters
 export const getNoAuthorizationProperties = async(req: Request, res: Response, next: NextFunction) => {
 
-    const properties = await Property.findAll( {
-        where: {
-            published: true
-        },
+    const {
+        offerType,
+        region,
+        country,
+        currency,
+        address,
+        title,
+        description,
+        bedrooms,
+        washrooms,
+        kitchens,
+        maxAmount,
+        promoted,
+        search,
+    } = req.query;
+
+    const where: any = {
+        published: true
+    };
+
+    if (offerType && typeof offerType === 'string') {
+        where.offerType = offerType;
+    }
+
+    if (region && typeof region === 'string') {
+        where.region = region;
+    }
+
+    if (country && typeof country === 'string') {
+        where.country = country;
+    }
+
+    if (currency && typeof currency === 'string') {
+        where.currency = currency;
+    }
+
+    if (address && typeof address === 'string') {
+        where.address = { [Op.iLike]: `%${address.trim()}%` };
+    }
+
+    if (bedrooms && !isNaN(Number(bedrooms))) {
+        where.rooms = Number(bedrooms);
+    }
+
+    if (washrooms && !isNaN(Number(washrooms))) {
+        where.washrooms = Number(washrooms);
+    }
+
+    if (kitchens && !isNaN(Number(kitchens))) {
+        where.kitchens = Number(kitchens);
+    }
+
+    if (maxAmount && !isNaN(Number(maxAmount))) {
+        where.amount = { [Op.lte]: Number(maxAmount) };
+    }
+
+    if (promoted !== undefined) {
+        if (promoted === 'true') {
+            where.promoted = true;
+        } else if (promoted === 'false') {
+            where.promoted = false;
+        }
+    }
+
+    // Broad fuzzy search
+    if (search && typeof search === 'string') {
+        const fuzzySearch = `%${search.trim()}%`;
+
+        where[Op.or] = [
+            { title: { [Op.iLike]: fuzzySearch } },
+            { description: { [Op.iLike]: fuzzySearch } },
+            { address: { [Op.iLike]: fuzzySearch } },
+            { region: { [Op.iLike]: fuzzySearch } },
+            { country: { [Op.iLike]: fuzzySearch } },
+        ];
+    }
+
+    const properties = await Property.findAll({
+        where,
         order: [['createdAt', 'DESC']],
     });
 

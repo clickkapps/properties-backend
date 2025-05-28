@@ -258,8 +258,8 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const categoryIds = inProduction ? [5,6,7] : [5,6,7]
-    const userIds = inProduction ? [15,17] : [15,17]
+    const categoryIds = inProduction ? [1,2,3] : [5,6,7]
+    const userIds = inProduction ? [5,6] : [15,17]
     const images = [
       "public/01793afe-41b4-43ea-8eb2-f670c6d1e4c1.jpg?mimeType=image/jpeg",
       "public/01b39e4e-794d-4f21-9407-05cba5e4d052.webp?mimeType=image/webp",

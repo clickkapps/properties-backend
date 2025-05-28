@@ -75,7 +75,7 @@ export const getUserAdvertisement = async(req: Request, res: Response, next: Nex
 }
 
 export const getPublicAdvertisement = async(req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as User
+
     const ads = await Advertisement.findAll({
         where: {
             status: "active",
@@ -91,6 +91,8 @@ export const getPublicAdvertisement = async(req: Request, res: Response, next: N
             ad.imagePath = split[1]
         }
 
+        return ad
+
     })
-    res.status(200).send({data: ads})
+    res.status(200).send({data: transformed})
 }

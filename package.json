@@ -19,11 +19,13 @@
     "seed:clear": "npx sequelize-cli db:seed:undo:all",
     "seed:properties": "npx sequelize-cli db:seed --seed 20250522082547-create_properties_seeder.js",
     "seed:rollback:properties": "npx sequelize-cli db:seed:undo --seed 20250522082547-create_properties_seeder.js",
+    "seed:system_user": "npx sequelize-cli db:seed --seed 20250527175600-system_user_seeder.js",
     "prod:seed": "NODE_ENV=production npx sequelize-cli db:seed:all",
     "prod:seed:rollback": "NODE_ENV=production npx sequelize-cli db:seed:undo",
     "prod:seed:clear": "NODE_ENV=production npx sequelize-cli db:seed:undo:all",
     "prod:seed:properties": "NODE_ENV=production npx sequelize-cli db:seed --seed 20250522082547-create_properties_seeder.js",
     "prod:seed:rollback:properties": "NODE_ENV=production npx sequelize-cli db:seed:undo --seed 20250522082547-create_properties_seeder.js",
+    "prod:seed:system_user": "NODE_ENV=production npx sequelize-cli db:seed --seed 20250527175600-system_user_seeder.js",
     "build:email": "npx maizzle build"
   },
   "keywords": [],

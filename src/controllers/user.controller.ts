@@ -10,19 +10,26 @@ import {defineAbilitiesFor} from "../helpers/defineAbility";
 
 export const getBasicInfo = async (req: Request, res: Response) => {
 
-    const { uid } = req.query // pass uid as query param if you want to update a different user
+    const { uid, loginId } = req.query // pass uid as query param if you want to update a different user
     const creator = (req.user as User)
     let userId = creator.id
     if(uid) {
         userId = +uid
     }
-    const user = await User.findByPk(userId, {
+
+    const options = {
         include: [{
             association: 'activeEntitlement',
         }, {
             association: 'permissions',
         }]
-    })
+    }
+
+    const user = loginId ? await User.findOne({
+        where: { loginId: loginId },
+        include: options.include
+    }) : await User.findByPk(userId, options)
+
     let apiResponse: ApiResponse
     if(!user) {
         apiResponse = { message: "User not found"};
