@@ -22,8 +22,9 @@ import showingsRoutes from "./routes/showings.routes";
 import path from "path";
 import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
+import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.3'
+const apiVersion = '1.0.6'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -114,6 +115,7 @@ if(inProductionMode) {
 }
 app.use('/api/auth', authRoutes)
 app.use('/api/users', isAuthenticated, userRoutes)
+app.use('/api/system', systemUserRoutes)
 app.use('/api/packages', packageRoutes)
 app.use('/api/properties', propertyRoutes )
 app.use('/api/subscription', subscriptionRoutes )

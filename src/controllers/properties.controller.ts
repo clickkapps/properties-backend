@@ -424,8 +424,6 @@ export const getNoAuthorizationProperties = async(req: Request, res: Response, n
         country,
         currency,
         address,
-        title,
-        description,
         bedrooms,
         washrooms,
         kitchens,
@@ -434,70 +432,71 @@ export const getNoAuthorizationProperties = async(req: Request, res: Response, n
         search,
     } = req.query;
 
-    const where: any = {
-        published: true
-    };
+    const conditions: any[] = [
+        { published: true }
+    ];
 
     if (offerType && typeof offerType === 'string') {
-        where.offerType = offerType;
+        conditions.push({ offerType });
     }
 
     if (region && typeof region === 'string') {
-        where.region = region;
+        conditions.push({ region });
     }
 
     if (country && typeof country === 'string') {
-        where.country = country;
+        conditions.push({ country });
     }
 
     if (currency && typeof currency === 'string') {
-        where.currency = currency;
+        conditions.push({ currency });
     }
 
     if (address && typeof address === 'string') {
-        where.address = { [Op.iLike]: `%${address.trim()}%` };
+        conditions.push({ address: { [Op.iLike]: `%${address.trim()}%` } });
     }
 
     if (bedrooms && !isNaN(Number(bedrooms))) {
-        where.rooms = Number(bedrooms);
+        conditions.push({ rooms: Number(bedrooms) });
     }
 
     if (washrooms && !isNaN(Number(washrooms))) {
-        where.washrooms = Number(washrooms);
+        conditions.push({ washrooms: Number(washrooms) });
     }
 
     if (kitchens && !isNaN(Number(kitchens))) {
-        where.kitchens = Number(kitchens);
-    }
-
-    if (maxAmount && !isNaN(Number(maxAmount))) {
-        where.amount = { [Op.lte]: Number(maxAmount) };
+        conditions.push({ kitchens: Number(kitchens) });
     }
 
     if (promoted !== undefined) {
-        if (promoted === 'true') {
-            where.promoted = true;
-        } else if (promoted === 'false') {
-            where.promoted = false;
-        }
+        conditions.push({ promoted: promoted === 'true' });
     }
 
-    // Broad fuzzy search
+    if (maxAmount && !isNaN(Number(maxAmount))) {
+        conditions.push({ amount: { [Op.lte]: Number(maxAmount) } });
+    }
+
     if (search && typeof search === 'string') {
         const fuzzySearch = `%${search.trim()}%`;
-
-        where[Op.or] = [
-            { title: { [Op.iLike]: fuzzySearch } },
-            { description: { [Op.iLike]: fuzzySearch } },
-            { address: { [Op.iLike]: fuzzySearch } },
-            { region: { [Op.iLike]: fuzzySearch } },
-            { country: { [Op.iLike]: fuzzySearch } },
-        ];
+        conditions.push({
+            [Op.or]: [
+                { title: { [Op.iLike]: fuzzySearch } },
+                { description: { [Op.iLike]: fuzzySearch } },
+                { address: { [Op.iLike]: fuzzySearch } },
+                { region: { [Op.iLike]: fuzzySearch } },
+                { country: { [Op.iLike]: fuzzySearch } },
+            ]
+        });
     }
+
+    const where = { [Op.and]: conditions };
 
     const properties = await Property.findAll({
         where,
-        order: [['createdAt', 'DESC']],
+        order: [
+            ['promoted', 'DESC'],       // Promoted first
+            ['createdAt', 'DESC'],      // Newest first within promoted/non-promoted
+        ],
     });
 
     const transformed = setAccessibleImages(properties)
