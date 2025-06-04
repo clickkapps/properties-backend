@@ -2,6 +2,8 @@ import {NextFunction, Request, Response} from "express";
 import {storage} from "../helpers/storage";
 import Advertisement from "../models/Advertisement";
 import User from "../models/User";
+import {defineAbilitiesFor} from "../helpers/defineAbility";
+import {permissionActions, permissionSubjects} from "../helpers/constants";
 
 export const postNewAdvertisement = async(req: Request, res: Response, next: NextFunction) => {
 
@@ -54,11 +56,16 @@ export const postNewAdvertisement = async(req: Request, res: Response, next: Nex
 }
 
 export const getUserAdvertisement = async(req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as User
+
+    const { userId } = req.query
+    const where: any = {}
+
+    if(userId) {
+        where.userId = userId
+    }
+
     const ads = await Advertisement.findAll({
-        where: {
-            userId: user.id,
-        },
+        where: where,
         order: [['createdAt', 'DESC']],
     })
 
@@ -78,10 +85,10 @@ export const getPublicAdvertisement = async(req: Request, res: Response, next: N
 
     const ads = await Advertisement.findAll({
         where: {
-            status: "active",
-            startDate: {
-                // [] startDate has began
-            }
+            status: "approved", // later change this to "active"
+            // startDate: {
+            //     // [] startDate has began
+            // }
         }
     })
     const transformed = ads.map((ad) => {
@@ -95,4 +102,35 @@ export const getPublicAdvertisement = async(req: Request, res: Response, next: N
 
     })
     res.status(200).send({data: transformed})
+}
+
+export const publishAdvertisement = async(req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+        const creator = req.user as User
+        const ability = defineAbilitiesFor(creator)
+
+        if(ability.cannot(permissionActions.publish, permissionSubjects.ads)) {
+            res.status(403).send({ message: "You are not authorized to publish an advertisement" })
+            return
+        }
+
+        const { id } = req.params
+        const { status } = req.query
+        const ad = await Advertisement.findByPk(id)
+        if(!ad || !["approved", "inactive"].includes(status as string)) {
+            res.status(400).send({ message: "Invalid request" })
+            return
+        }
+
+        await ad.update({
+            status: status as string,
+        })
+
+        res.status(200).send({ message: "updated! "})
+
+    }catch (error) {
+        next(error)
+    }
 }

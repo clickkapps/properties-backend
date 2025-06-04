@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function sendSMS(to: string, message: string): Promise<void> {
     try {
-        const response = await axios.get('https://apps.mnotify.net/smsapi', {
+        const response = await axios.post('https://apps.mnotify.net/smsapi', {
             params: {
                 key: process.env.MNOTIFY_API_KEY,
                 to: to,
@@ -11,7 +11,8 @@ export async function sendSMS(to: string, message: string): Promise<void> {
             },
         });
 
-        console.log('SMS Sent:', response.data);
+        console.log('SMS response:', response.data);
+
     } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error('Error sending SMS:', error.response?.data || error.message);

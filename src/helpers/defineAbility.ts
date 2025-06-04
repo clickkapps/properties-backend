@@ -15,12 +15,14 @@ export function defineAbilitiesFor(user: User) {
 
     if (role === 'admin' || role === 'system') {
         can(permissionActions.manage, permissionSubjects.all);
+        cannot(permissionActions.create, permissionSubjects.ads)
     } else if (role === 'agent') {
         can(permissionActions.create, permissionSubjects.properties);
         can(permissionActions.read, permissionSubjects.unpublishedProperties);
         can(permissionActions.read, permissionSubjects.publishedProperties);
         cannot(permissionActions.publish, permissionSubjects.properties);
         cannot(permissionActions.unpublish, permissionSubjects.properties);
+        cannot(permissionActions.publish, permissionSubjects.ads);
     }
 
     return build();

@@ -24,7 +24,7 @@ import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.6'
+const apiVersion = '1.0.10'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -81,6 +81,7 @@ let whitelist = inProductionMode ? [
     webAppUrl,
     'http://localhost:5173',
     "https://properties-8eaf0.web.app",
+    "https://ghanamls.org",
 ] : ['http://localhost:5173']
 
 const corsOptions: CorsOptions = {

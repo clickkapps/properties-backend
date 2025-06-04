@@ -10,6 +10,7 @@ import User from "../models/User";
 import PasswordAttempt from "../models/PasswordAttempt";
 import passwordAttempt from "../models/PasswordAttempt";
 import {autoCreateUser} from "../traits/user.trait";
+import {sendSMS} from "../notifications/smsService";
 
 export const getGoogleAuthentication =  passport.authenticate('google', { scope: [ 'email', 'profile' ] })
 export const getGoogleCallback = passport.authenticate( 'google', {
@@ -59,7 +60,8 @@ export const requestPhoneAuthentication = async (req: Request, res: Response, ne
        })
 
        if(existingOTP) {
-           apiResponse = { message: "Verification code already sent to email", data:{
+           console.log("Verification code already sent to phone")
+           apiResponse = { message: "Verification code already sent. You can retry again after 3 minutes", data:{
                    serverId: existingOTP.serverId,
                    phone: existingOTP.phone,
                    isNew: false
@@ -93,8 +95,11 @@ export const requestPhoneAuthentication = async (req: Request, res: Response, ne
            code: await hashPassword(otp)
        })
        console.log("otp", otp)
+       sendSMS(phone, `Your verification code is ${otp}`).catch(error => {
+           console.log("Error sending SMS:", error.message)
+       })
 
-       apiResponse = { message: "Verification code sent to email", data:{
+       apiResponse = { message: "Verification code sent to your phone", data:{
                serverId: otpCreated.serverId,
                phone: otpCreated.phone,
                isNew: true

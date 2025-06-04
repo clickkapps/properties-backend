@@ -48,6 +48,15 @@ class User extends Model {
     @Attribute(DataTypes.STRING)
     contactPhone?: CreationOptional<string>
 
+    @Attribute(DataTypes.STRING)
+    contactAddress?: CreationOptional<string>
+
+    @Attribute(DataTypes.STRING)
+    contactCountry?: CreationOptional<string>
+
+    @Attribute(DataTypes.STRING)
+    contactRegion?: CreationOptional<string>
+
     @Attribute(DataTypes.DATE)
     lastLoginAt?: Date;
 

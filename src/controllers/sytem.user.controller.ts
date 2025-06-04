@@ -9,7 +9,15 @@ export const getSystemIndexInfo = async (req: Request, res: Response, next: Next
             where: {
                 loginId: "support_442"
             },
-            attributes: ['contactEmail', 'contactPhone', 'companyName', 'companyLocation'] // only return these columns
+            attributes: [
+                'contactEmail',
+                'contactPhone',
+                'contactRegion',
+                'contactAddress',
+                'contactCountry',
+                'companyName',
+                'companyLocation'
+            ] // only return these columns
         })
 
         const userJson = supportUser?.toJSON()
