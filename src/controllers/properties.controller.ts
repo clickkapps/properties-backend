@@ -63,11 +63,18 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             washrooms
         } = req.body
 
-        if(!title || !description || !categoryId || !country || !region || !currency || !amount) {
+        if(!title || !categoryId || !country || !region || !currency || !amount) {
             apiResponse = { message: "Invalid request" };
             res.status(400).send(apiResponse)
             return;
         }
+
+        // Remove non-numeric characters except digits and dot
+        const cleaned = amount.replace(/[^0-9.]/g, '');
+        // Parse and round to 2 decimal places
+        const amtString = parseFloat(cleaned).toFixed(2);
+        // Convert back to number (optional, if you want it as a number not string)
+        const cleanedAmount = parseFloat(amtString);
 
         let mainImagePath
         // upload main image and get path
@@ -83,10 +90,10 @@ export const createProperty = async(req: Request, res: Response, next: NextFunct
             userId: ownerId,
             creatorId: creatorId,
             title,
-            description,
+            description: description || null,
             mainImagePath,
             offerType,
-            amount: amount,
+            amount: cleanedAmount,
             currency,
             address,
             country,

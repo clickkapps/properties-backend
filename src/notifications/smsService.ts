@@ -1,14 +1,17 @@
 import axios from 'axios';
 
 export async function sendSMS(to: string, message: string): Promise<void> {
+
     try {
-        const response = await axios.post('https://apps.mnotify.net/smsapi', {
-            params: {
-                key: process.env.MNOTIFY_API_KEY,
-                to: to,
-                msg: message,
-                sender_id: process.env.MNOTIFY_SENDER_ID,
-            },
+        const apiKey = process.env.MNOTIFY_API_KEY;
+        const senderId = process.env.MNOTIFY_SENDER_ID;
+        console.log("senderId: ", senderId, ", key: ", apiKey)
+        const response = await axios.post(`https://api.mnotify.com/api/sms/quick?key=${apiKey}`,{
+            "recipient": [to],
+            "sender": senderId,
+            "message": message,
+            "is_schedule": "false",
+            "schedule_date": ""
         });
 
         console.log('SMS response:', response.data);

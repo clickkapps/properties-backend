@@ -95,7 +95,7 @@ export const requestPhoneAuthentication = async (req: Request, res: Response, ne
            code: await hashPassword(otp)
        })
        console.log("otp", otp)
-       sendSMS(phone, `Your verification code is ${otp}`).catch(error => {
+       sendSMS(phone, `Do not share this details with anyone. ${otp}`).catch(error => {
            console.log("Error sending SMS:", error.message)
        })
 

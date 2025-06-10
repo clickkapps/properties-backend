@@ -63,7 +63,7 @@ router.get("/public/featured", getFeaturedNoAuthorizationProperties)
 
 router.post("/", isAuthenticated, isAuthorized(permissionActions.create, permissionSubjects.properties), reqFile.fields([
         { name: 'mainImage', maxCount: 1 },
-        { name: 'otherImages', maxCount: 10 }
+        { name: 'otherImages' }
 ]), createProperty);
 router.get("/:id", getPropertyDetail)
 router.delete("/:id", isAuthenticated, removeProperty)
