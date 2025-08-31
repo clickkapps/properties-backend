@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   redis:
     image: redis:latest
@@ -10,5 +9,19 @@ services:
       - .env.redis
     volumes:
       - ./redis_data:/data
+
+  backend:
+    depends_on:
+      - redis
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      # mount node_modules as anonymous volume so host files don’t overwrite container deps
+      - /app/node_modules
+
+
 
 

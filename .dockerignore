@@ -6,6 +6,14 @@ logs
 log.txt
 npm-debug.log*
 
+# docker files
+docker-compose.yml
+Dockerfile
+
+# git files
+.git
+.gitignore
+
 # Testing output
 lib-cov/**
 coverage/**
@@ -19,7 +27,6 @@ production.env
 
 # Dependency directories
 node_modules
-package-lock.json
 migrations
 config
 redis_data

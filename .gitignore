@@ -6,6 +6,13 @@ logs
 log.txt
 npm-debug.log*
 
+# docker files
+docker-compose.yml
+
+# git files
+.git
+.gitignore
+
 # Testing output
 lib-cov/**
 coverage/**

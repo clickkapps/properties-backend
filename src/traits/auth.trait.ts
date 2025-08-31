@@ -1,5 +1,4 @@
 import {CreateUserParams, TokenPayload} from "../types/auth.types";
-import {generateKey, hashPassword} from "../helpers/utils";
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import User from "../models/User";

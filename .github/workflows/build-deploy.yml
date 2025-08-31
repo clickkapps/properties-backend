@@ -1,0 +1,69 @@
+name: Build and Deploy To Prod
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/propertiespark-backend
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+#  pull-and-deploy:
+#    environment: production
+#    needs: build-and-push
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Write private key to file
+#        run: |
+#          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > key.pem
+#          chmod 600 key.pem
+#
+#      - name: Add known_hosts
+#        run: |
+#          mkdir -p ~/.ssh
+#          echo "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+#
+#      - name: Deploy (pull new image & restart)
+#        run: |
+#          SSH_OPTS="-o StrictHostKeyChecking=yes"
+#          if [ -z "${{ secrets.KNOWN_HOSTS }}" ]; then
+#            # fall back if you didn't set KNOWN_HOSTS
+#            SSH_OPTS="-o StrictHostKeyChecking=no"
+#          fi
+#
+#          ssh -i key.pem $SSH_OPTS ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
+#            set -e
+#            cd ~/apps/rentmux
+#            docker compose pull
+#            docker compose up -d
+#            docker image prune -f
+#          '
