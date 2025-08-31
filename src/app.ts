@@ -24,7 +24,7 @@ import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.16'
+const apiVersion = '1.0.17'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -105,6 +105,10 @@ app.use(function(req,res,next){
 });
 
 app.use(logIncomingRequests)
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: `OK` })
+})
 
 app.get('/', (req, res) => {
     res.json({ message: `API VERSION ${apiVersion}` })
