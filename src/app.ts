@@ -23,7 +23,7 @@ import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.18'
+const apiVersion = '1.0.19'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -140,15 +140,16 @@ db.authenticate()
 .then(() => {
     console.log("databaseLog","Connection to the database has been established successfully.");
     // return User.create({ })
+    // console.log("inserted result - ", result);
+    app.listen(process.env.PORT, () => {
+        console.log(`Server running on port ${process.env.PORT}`)
+    })
 })
 .catch((err: any) => {
     console.log("databaseLog","Connection error:", err.message);
 });
 
-// console.log("inserted result - ", result);
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`)
-})
+
 
 
 
