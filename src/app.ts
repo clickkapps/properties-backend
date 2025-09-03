@@ -19,12 +19,11 @@ import cors, {CorsOptions} from "cors";
 import adRoutes from "./routes/ad.routes";
 import throttleMiddleware from "./middlewares/throttle.middleware";
 import showingsRoutes from "./routes/showings.routes";
-import path from "path";
 import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.17'
+const apiVersion = '1.0.18'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -44,7 +43,7 @@ let redisStore: RedisStore | undefined
 if(inProductionMode) {
 
     const redisClient = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
+        host: process.env.REDIS_HOST || 'redis',
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD || undefined,
     });

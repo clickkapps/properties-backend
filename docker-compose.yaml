@@ -14,11 +14,14 @@ services:
     depends_on:
       - redis
     build: .
+    restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
       - .env
     volumes:
+      # Mount SSL certificate from host to container
+      - ./ssl/rds/us-east-1-bundle.pem:/app/ssl/rds/us-east-1-bundle.pem:ro
       # mount node_modules as anonymous volume so host files don’t overwrite container deps
       - /app/node_modules
 

@@ -15,6 +15,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
+# Create SSL directory in container
+RUN mkdir -p /app/ssl/rds
 # change ./dist/server.js to your actual entry file
 EXPOSE 3000
 CMD ["node", "dist/app.js"]
