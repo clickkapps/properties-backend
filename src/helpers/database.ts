@@ -16,6 +16,7 @@ import PasswordAttempt from "../models/PasswordAttempt";
 import PropertyShowing from "../models/PropertyShowing";
 import fs from 'fs';
 import Permission from "../models/Permission";
+import {getSSLConfig} from "./sslConfig";
 
 const inProductionMode = process.env.NODE_ENV === 'production';
 
@@ -25,22 +26,10 @@ const dbUsername = process.env.DB_USERNAME || '';
 const dbPassword = process.env.DB_PASSWORD || '';
 const dbPort = process.env.DB_PORT;
 
-const sslPath = process.env.DB_CERT_PATH
 // console.log("inProductionMode", inProductionMode, "sslPath", sslPath)
 
 // !IMPORTANT FRO PRODUCTION. Trust only AWS RDS certificate
-let sslConfig = undefined
-try {
-    if (inProductionMode && sslPath) {
-        sslConfig = {
-            rejectUnauthorized: true,
-            ca: fs.readFileSync(sslPath).toString(), // trust only amazon certificate
-        }
-    }
-}catch (e) {
-    console.log("customLog", "error reading from sslPath", e )
-}
-
+let sslConfig = getSSLConfig();
 
 const sequelize = new Sequelize({
     dialect: PostgresDialect,
