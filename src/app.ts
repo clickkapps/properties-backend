@@ -23,7 +23,7 @@ import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.20'
+const apiVersion = '1.0.21'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -146,7 +146,7 @@ db.authenticate()
     })
 })
 .catch((err: any) => {
-    console.log("databaseLog","Connection error:", err.message);
+    console.log("databaseLog","Connection error:", err);
 });
 
 

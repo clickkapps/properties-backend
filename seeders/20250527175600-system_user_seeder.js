@@ -17,7 +17,7 @@ module.exports = {
     await queryInterface.bulkInsert('Users', [
       {
         firstName: 'System',
-        lastName: 'GhanaMLS',
+        lastName: 'PPark',
         loginId: 'system_983',
         contactEmail: 'system@properties.com',
         contactPhone: '0000000000',
@@ -30,13 +30,13 @@ module.exports = {
       },
       {
         firstName: 'Support',
-        lastName: 'GhanaMLS',
+        lastName: 'PPark',
         loginId: 'support_442',
-        contactEmail: 'support@ghanamls.org',
-        contactPhone: '0244556677',
-        contactAddress: 'East Legon Hills',
-        contactCountry: 'Ghana',
-        contactRegion: 'Accra',
+        contactEmail: 'support@propertiespark.com',
+        contactPhone: '+1 709 777 7777',
+        contactAddress: "St. John's",
+        contactCountry: 'Canada',
+        contactRegion: "Newfoundland",
         requiresPasswordUpdate: false,
         basicInfoUpdatedAt: new Date(),
         role: 'support',

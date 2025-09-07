@@ -10,7 +10,7 @@ const GoogleStrategy = googleOAuth2.Strategy;
 export const useGoogleStrategy = new GoogleStrategy({
         clientID:     process.env.GOOGLE_CLIENT_ID || '',
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-        callbackURL: `${process.env['APP_URL'] || ''}/auth/google/callback`,
+        callbackURL: `${process.env['APP_URL'] || ''}/api/auth/google/callback`,
         passReqToCallback   : true
     },  (req: Request, accessToken: string, refreshToken: string, profile: any, done: VerifyCallback)=>  {
         // console.log("req => ", profile);
