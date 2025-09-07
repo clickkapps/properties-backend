@@ -14,8 +14,8 @@ import {sendSMS} from "../notifications/smsService";
 
 export const getGoogleAuthentication =  passport.authenticate('google', { scope: [ 'email', 'profile' ] })
 export const getGoogleCallback = passport.authenticate( 'google', {
-    successRedirect: '/auth/success',
-    failureRedirect: '/auth/failure'
+    successRedirect: '/api/auth/success',
+    failureRedirect: '/api/auth/failure'
 })
 
 export const getAuthenticationCompleted = (req: Request, res: Response) => {
