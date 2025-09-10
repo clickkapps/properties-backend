@@ -23,7 +23,7 @@ import {RedisStore} from "connect-redis"
 import Redis from 'ioredis';
 import systemUserRoutes from "./routes/system.user.routes";
 
-const apiVersion = '1.0.22'
+const apiVersion = '1.0.23'
 
 // dotenv.config({ path: path.resolve(process.cwd(), '.env') } ) //to switch to production from local environment add
 console.log("configs", {
@@ -76,11 +76,9 @@ app.use(session(sessionConfig))
 const webAppUrl = process.env.WEB_APP_URL || '';
 // add any other client developer's IP to it
 let whitelist = inProductionMode ? [
-    "http://99.192.8.22:5173",
     webAppUrl,
-    'http://localhost:5173',
     "https://properties-8eaf0.web.app",
-    "https://ghanamls.org",
+    "https://propertiespark.com",
 ] : ['http://localhost:5173']
 
 const corsOptions: CorsOptions = {
@@ -106,6 +104,8 @@ app.use(function(req,res,next){
 app.use(logIncomingRequests)
 
 app.get('/health', (req, res) => {
+    // check the health of the inventory portfolio application
+    fetch("https://inventory-py-backend.onrender.com", { method: "GET",}).catch(console.error)
     res.status(200).json({ status: `OK` })
 })
 
